@@ -2,7 +2,7 @@
 #include "Calendar.hpp"
 
 TextField::TextField(string type, string label, int x, int y){
-    font_.loadFromFile("./Data/arial.ttf");
+    font_.loadFromFile("/Users/user/Documents/прога универ/сем 3/Calendar/Calendar/Data/arial.ttf");
 
     type_ = type;
     

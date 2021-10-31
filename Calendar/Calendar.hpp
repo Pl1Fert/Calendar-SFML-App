@@ -70,10 +70,13 @@ private:
     string addSpaces(string);
     string removeSpaces(string);
     
+    int getActiveYear();
+    int getActiveMonth();
     void loadPersistentEvents();
     void loadUniqueEvents();
     void deleteEvent(Event*);
     void constructMonth();
+    void drawMonth();
     void handleInput(sf::Event*);
     
     void nextMonth();

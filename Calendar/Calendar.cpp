@@ -8,7 +8,7 @@ Calendar::Calendar()
     m_window.setFramerateLimit(60);
     m_window.setVerticalSyncEnabled(true);
     
-    m_font.loadFromFile("/Users/user/Downloads/CPP-SFML-Calendar-for-Windows-x86-1.0/Data/arial.ttf");
+    m_font.loadFromFile("/Users/user/Documents/прога универ/сем 3/Calendar/Calendar/Data/arial.ttf");
     
     m_currentTime = time(0);
     m_currentDate = localtime(&m_currentTime);
@@ -22,25 +22,25 @@ Calendar::Calendar()
     m_monthLabel.setString(getMonthString(m_currentDate->tm_mon) + " " + convertIntToString(m_currentDate->tm_year + 1900));
     m_monthLabel.setFont(m_font);
     m_monthLabel.setFillColor(sf::Color::Black);
-    m_monthLabel.setCharacterSize(20);
+    m_monthLabel.setCharacterSize(30);
     m_monthLabel.setStyle(sf::Text::Bold);
-    centerText(&m_monthLabel, 0, 800, 10);
+    centerText(&m_monthLabel, 0, 1600, 10);
     
-    m_daysLabel.setString("     Monday          Tuesday      Wednesday       Thursday         Friday          Saturday           Sunday     ");
-    m_daysLabel.setPosition(0, 40);
+    m_daysLabel.setString("     Monday      Tuesday      Wednesday       Thursday         Friday          Saturday           Sunday     ");
+    m_daysLabel.setPosition(0, 50);
     m_daysLabel.setFont(m_font);
     m_daysLabel.setFillColor(sf::Color::Black);
-    m_daysLabel.setCharacterSize(16);
+    m_daysLabel.setCharacterSize(24);
     m_daysLabel.setStyle(sf::Text::Bold);
     
-    m_leftSelectorImage.loadFromFile("../Images/SelectorLeft.png");
-    m_rightSelectorImage.loadFromFile("../Images/SelectorRight.png");
+    m_leftSelectorImage.loadFromFile("/Users/user/Documents/прога универ/сем 3/Calendar/Calendar/Images/SelectorLeft.png");
+    m_rightSelectorImage.loadFromFile("/Users/user/Documents/прога универ/сем 3/Calendar/Calendar/Images/SelectorRight.png");
     m_leftSelector.setTexture(m_leftSelectorImage);
-    m_leftSelector.setPosition(200, 10);
+    m_leftSelector.setPosition(600, 10);
     m_rightSelector.setTexture(m_rightSelectorImage);
-    m_rightSelector.setPosition(579, 10);
+    m_rightSelector.setPosition(980, 10);
     
-    m_dividerImage.loadFromFile("../Images/Divider.png");
+    m_dividerImage.loadFromFile("/Users/user/Documents/прога универ/сем 3/Calendar/Calendar/Images/Divider.png");
     m_divider.setTexture(m_dividerImage);
     m_divider.setPosition(320, 448);
     m_selectedDay.setString("");
@@ -49,10 +49,10 @@ Calendar::Calendar()
     m_selectedDay.setCharacterSize(16);
     m_selectedDay.setStyle(sf::Text::Bold);
     
-    m_deleteButtonImage.loadFromFile("../Images/DeleteButton2.png");
+    m_deleteButtonImage.loadFromFile("/Users/user/Documents/прога универ/сем 3/Calendar/Calendar/Images/DeleteButton2.png");
     m_deleteButton.setTexture(m_deleteButtonImage);
     
-    m_addNoteButtonImage.loadFromFile("../Images/AddNote.png");
+    m_addNoteButtonImage.loadFromFile("/Users/user/Documents/прога универ/сем 3/Calendar/Calendar/Images/AddNote.png");
     m_addNoteButton.setTexture(m_addNoteButtonImage);
     m_addNoteButton.setPosition(300, 510);
     
@@ -68,7 +68,6 @@ Calendar::Calendar()
     m_typeBox->CreateOption("Unique ", sf::Color::Black, "Unique notes are for a specific day of a specific year. \nThey do not carry over to future years.", 80, 515);
     m_typeBox->CreateOption("Persistent ", sf::Color::Blue, "Persistent notes will appear on the same day of every \nyear. Useful for birthdays and such.", 180, 515);
     
-    loadPersistentEvents();
     loadUniqueEvents();
     constructMonth();
 }
@@ -158,9 +157,7 @@ void Calendar::run()
 
 string Calendar::convertIntToString(int n)
 {
-    stringstream ss;
-    ss << n;
-    string returnString = ss.str();
+    string returnString = to_string(n);
     return returnString;
 }
 
@@ -235,25 +232,6 @@ string Calendar::removeSpaces(string str)
     return str;
 }
 
-void Calendar::loadPersistentEvents()
-{
-    ifstream file;
-    file.open("./Data/PersistingEvents.cll");
-    
-    string title = "";
-    int month = 0, day = 0;
-    
-    while(file >> title)
-    {
-        file >> month;
-        file >> day;
-        
-        m_persistentEvents.push_back(new Event(addSpaces(title), month, day));
-    }
-    
-    file.close();
-}
-
 void Calendar::loadUniqueEvents()
 {
     ifstream file;
@@ -300,6 +278,105 @@ void Calendar::deleteEvent(Event* event)
     }
 }
 
+int Calendar::getActiveYear()
+{
+    return m_activeYear;
+}
+
+int Calendar::getActiveMonth()
+{
+    return m_activeMonth;
+}
+
+void Calendar::drawMonth()
+{
+    m_monthLabel.setString(getMonthString(m_activeMonth) + " " + convertIntToString(m_activeYear));
+    int currentYear = getActiveYear();
+    int currentMonth = getActiveMonth() + 1;
+    
+    int dayOfTheWeek;
+    int day = 1;
+    static int t[] = {0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4};
+        
+    if(currentMonth < 3)
+        currentYear--;
+    
+    dayOfTheWeek = ((currentYear + currentYear / 4 - currentYear / 100 + currentYear / 400 + t[currentMonth-1] + day) % 7) - 1;
+    
+    if(dayOfTheWeek < 0)
+        dayOfTheWeek = 6;
+    
+    int daysInLastMonth = 0;
+    if(m_activeMonth != 0)
+    {
+        daysInLastMonth = getDaysInMonth(m_activeMonth - 1, m_activeYear);
+    }
+    else
+    {
+        daysInLastMonth = getDaysInMonth(11, m_activeYear - 1);
+    }
+    int daysInThisMonth = getDaysInMonth(m_activeMonth, m_activeYear);
+    
+    int iterator = 0;
+
+    if(dayOfTheWeek == 0)
+    {
+        dayOfTheWeek += 7;
+    }
+    
+    //set last month's days.
+    for(int n = daysInLastMonth - (dayOfTheWeek-1); n <= daysInLastMonth; n++)
+    {
+        m_month[iterator]->SetNumber(n);
+        m_month[iterator]->SetType("inactive");
+        iterator++;
+    }
+    
+    //set this month's days.
+    for(int i = 1; i <= daysInThisMonth; i++)
+    {
+        m_month[iterator]->SetNumber(i);
+        
+        if(i == m_currentDate->tm_mday && m_activeMonth == m_currentDate->tm_mon && m_activeYear == m_currentDate->tm_year + 1900)
+        {
+            m_month[iterator]->SetType("current");
+        }
+        else
+        {
+            m_month[iterator]->SetType("default");
+        }
+
+        iterator++;
+    }
+    
+    //set next month's days.
+    for(int r = 1; iterator < m_month.size(); r++)
+    {
+        m_month[iterator]->SetNumber(r);
+        m_month[iterator]->SetType("inactive");
+        iterator++;
+    }
+            
+    //add any unique events
+    for(int ue = 0; ue < m_uniqueEvents.size(); ue++)
+    {
+        if(m_uniqueEvents[ue]->GetMonth() == m_activeMonth && m_uniqueEvents[ue]->GetYear() == m_activeYear)
+        {
+            for(int day = 0; day < m_month.size(); day++)
+            {
+                if(m_month[day]->GetNumber() == m_uniqueEvents[ue]->GetDay())
+                {
+                    if(m_month[day]->GetType() == "default" || m_month[day]->GetType() == "current")
+                    {
+                        //month_[day]->AddContent(uniqueEvents_[ue]->GetTitle());
+                        m_month[day]->AddEvent(m_uniqueEvents[ue]);
+                    }
+                }
+            }
+        }
+    }
+}
+
 void Calendar::constructMonth()
 {
     //create day objects.
@@ -307,24 +384,22 @@ void Calendar::constructMonth()
     {
         for(int w = 0; w < 7; w++)
         {
-            m_month.push_back(new Day(11 + (w * 111), 70 + (h * 61), &m_font));
+            m_month.push_back(new Day(11 + (w * 154), 70 + (h * 81), &m_font));//посчитать потом под 1600 на 1200
         }
     }
     
-    int dayOfTheWeek = m_currentDate->tm_wday;
+    //Tomohiko Sakamoto’s Algorithm
+    int currentYear = m_currentDate->tm_year;
+    int currentMonth = m_currentDate->tm_mon + 1;
     
-    //find which day of the week the first of the month falls under.
-    for(int d = m_currentDate->tm_mday; d > 0; d--)
-    {
-        if(dayOfTheWeek == 0)
-        {
-            dayOfTheWeek = 6;
-        }
-        else
-        {
-            dayOfTheWeek--;
-        }
-    }
+    int dayOfTheWeek;
+    int day = 1;
+    static int t[] = {0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4};
+        
+    if(currentMonth < 3)
+        currentYear--;
+    
+    dayOfTheWeek = ((currentYear + currentYear / 4 - currentYear / 100 + currentYear / 400 + t[currentMonth - 1] + day) % 7);
     
     int daysInLastMonth = 0;
     if(m_currentDate->tm_mon != 0)
@@ -337,7 +412,6 @@ void Calendar::constructMonth()
     }
     int daysInThisMonth = getDaysInMonth(m_currentDate->tm_mon, m_currentDate->tm_year + 1900);
     
-    //even without this, the calendar is still accurate. It just looks nicer to have some days from the previous month displayed.
     if(dayOfTheWeek == 0)
     {
         dayOfTheWeek += 7;
@@ -371,27 +445,13 @@ void Calendar::constructMonth()
     }
     
     //set next month's days.
-    for(int r = 1; iterator < m_month.size(); r++)
+    for(int i = 1; iterator < m_month.size(); i++)
     {
-        m_month[iterator]->SetNumber(r);
+        m_month[iterator]->SetNumber(i);
         m_month[iterator]->SetType("inactive");
         iterator++;
     }
-    
-    //add any persistent events.
-//    for(int p = 0; p < m_persistentEvents.size(); p++){
-//        if(m_persistentEvents[p]->GetMonth() == activeMonth_){
-//            for(int day = 0; day < month_.size(); day++){
-//                if(month_[day]->GetNumber() == m_persistentEvents[p]->GetDay()){
-//                    if(month_[day]->GetType() == "default" || month_[day]->GetType() == "current"){
-//                        //month_[day]->AddContent(persistentEvents_[p]->GetTitle());
-//                        month_[day]->AddEvent(persistentEvents_[p]);
-//                    }
-//                }
-//            }
-//        }
-//    }
-    
+        
     //add any unique events.
     for(int ue = 0; ue < m_uniqueEvents.size(); ue++)
     {
@@ -403,13 +463,63 @@ void Calendar::constructMonth()
                 {
                     if(m_month[day]->GetType() == "default" || m_month[day]->GetType() == "current")
                     {
-                        //month_[day]->AddContent(uniqueEvents_[ue]->GetTitle());
                         m_month[day]->AddEvent(m_uniqueEvents[ue]);
                     }
                 }
             }
         }
     }
+}
+
+void Calendar::nextMonth()
+{
+    m_target = NULL;
+    m_targetEvent = NULL;
+    m_targetTextField = NULL;
+    
+    //clear all content
+    for(int yad = 0; yad < m_month.size(); yad++)
+    {
+        m_month[yad]->ClearContent();
+    }
+        
+    if(m_activeMonth == 11)
+    {
+        m_activeMonth = 0;
+        m_activeYear++;
+    }
+    else
+    {
+        m_activeMonth++;
+    }
+    
+    drawMonth();
+}
+
+void Calendar::prevMonth()
+{
+    m_target = NULL;
+    m_targetEvent = NULL;
+    m_targetTextField = NULL;
+
+    //clear all content
+    for(int yad = 0; yad < m_month.size(); yad++)
+    {
+        m_month[yad]->ClearContent();
+    }
+    
+    //change current month.
+    if(m_activeMonth == 0)
+    {
+        m_activeMonth = 11;
+        m_activeYear--;
+    }
+    else
+    {
+        m_activeMonth--;
+    }
+    
+    drawMonth();
 }
 
 void Calendar::handleInput(sf::Event* event)
@@ -608,312 +718,8 @@ void Calendar::handleInput(sf::Event* event)
     }
 }
 
-void Calendar::nextMonth()
-{
-    m_target = NULL;
-    m_targetEvent = NULL;
-    m_targetTextField = NULL;
-    
-    int dayOfTheWeek = 0;
-    bool found = false;
-    
-    //clear all content
-    for(int yad = 0; yad < m_month.size(); yad++)
-    {
-        m_month[yad]->ClearContent();
-    }
-    
-    for(int d = 0; d < m_month.size(); d++)
-    {
-        if(m_month[d]->GetType() == "inactive" && m_month[d]->GetNumber() == 1)
-        {
-            found = true;
-        }
-        else if(found == false)
-        {
-            if(dayOfTheWeek == 6)
-            {
-                dayOfTheWeek = 0;
-            }
-            else{
-                dayOfTheWeek++;
-            }
-        }
-    }
-    
-    if(m_activeMonth == 11)
-    {
-        m_activeMonth = 0;
-        m_activeYear++;
-    }
-    else
-    {
-        m_activeMonth++;
-    }
-    m_monthLabel.setString(getMonthString(m_activeMonth) + " " + convertIntToString(m_activeYear));
-    
-    int daysInLastMonth = 0;
-    if(m_activeMonth != 0)
-    {
-        daysInLastMonth = getDaysInMonth(m_activeMonth - 1, m_activeYear);
-    }
-    else
-    {
-        daysInLastMonth = getDaysInMonth(11, m_activeYear - 1);
-    }
-    int daysInThisMonth = getDaysInMonth(m_activeMonth, m_activeYear);
-    
-    int iterator = 0;
-
-    //even without this, the calendar is still accurate. It just looks nicer to have some days from the previous month displayed.
-    if(dayOfTheWeek == 0)
-    {
-        dayOfTheWeek += 7;
-    }
-    
-    //set last month's days.
-    for(int n = daysInLastMonth - (dayOfTheWeek - 1); n <= daysInLastMonth; n++)
-    {
-        m_month[iterator]->SetNumber(n);
-        m_month[iterator]->SetType("inactive");
-        iterator++;
-    }
-    
-    //set this month's days.
-    for(int i = 1; i <= daysInThisMonth; i++)
-    {
-        m_month[iterator]->SetNumber(i);
-        
-        if(i == m_currentDate->tm_mday && m_activeMonth == m_currentDate->tm_mon && m_activeYear == m_currentDate->tm_year + 1900)
-        {
-            m_month[iterator]->SetType("current");
-        }
-        else
-        {
-            m_month[iterator]->SetType("default");
-        }
-
-        iterator++;
-    }
-    
-    //set next month's days.
-    for(int r = 1; iterator < m_month.size(); r++)
-    {
-        m_month[iterator]->SetNumber(r);
-        m_month[iterator]->SetType("inactive");
-        iterator++;
-    }
-    
-    //add any persistent events
-//    for(int p = 0; p < persistentEvents_.size(); p++)
-//    {
-//        if(persistentEvents_[p]->GetMonth() == activeMonth_)
-//        {
-//            for(int day = 0; day < month_.size(); day++)
-//            {
-//                if(month_[day]->GetNumber() == persistentEvents_[p]->GetDay())
-//                {
-//                    if(month_[day]->GetType() == "default" || month_[day]->GetType() == "current")
-//                    {
-//                        month_[day]->AddEvent(persistentEvents_[p]);
-//                    }
-//                }
-//            }
-//        }
-//    }
-    
-    //add any unique events
-    for(int ue = 0; ue < m_uniqueEvents.size(); ue++)
-    {
-        if(m_uniqueEvents[ue]->GetMonth() == m_activeMonth && m_uniqueEvents[ue]->GetYear() == m_activeYear)
-        {
-            for(int day = 0; day < m_month.size(); day++)
-            {
-                if(m_month[day]->GetNumber() == m_uniqueEvents[ue]->GetDay())
-                {
-                    if(m_month[day]->GetType() == "default" || m_month[day]->GetType() == "current")
-                    {
-                        //month_[day]->AddContent(uniqueEvents_[ue]->GetTitle());
-                        m_month[day]->AddEvent(m_uniqueEvents[ue]);
-                    }
-                }
-            }
-        }
-    }
-    
-}
-
-void Calendar::prevMonth()
-{
-    m_target = NULL;
-    m_targetEvent = NULL;
-    m_targetTextField = NULL;
-
-    int numToFind = 0;
-    if(m_activeMonth != 0)
-    {
-        numToFind = getDaysInMonth(m_activeMonth - 1, m_activeYear);
-    }
-    else
-    {
-        numToFind = getDaysInMonth(11, m_activeYear - 1);
-    }
-    
-    int dayOfTheWeek = 0;
-    bool found = false;
-    
-    //clear all content
-    for(int yad = 0; yad < m_month.size(); yad++)
-    {
-        m_month[yad]->ClearContent();
-    }
-    
-    //find reference point (the final day) from the current month.
-    for(int d = 0; d < m_month.size(); d++)
-    {
-        if(m_month[d]->GetType() == "inactive" && m_month[d]->GetNumber() == numToFind)
-        {
-            found = true;
-        }
-        else if(found == false)
-        {
-            if(dayOfTheWeek == 6)
-            {
-                dayOfTheWeek = 0;
-            }
-            else
-            {
-                dayOfTheWeek++;
-            }
-        }
-    }
-    
-    //find the day of the week that the first of last month falls under.
-    for(int a = numToFind - 1; a >= 1; a--)
-    {
-        if(dayOfTheWeek == 0)
-        {
-            dayOfTheWeek = 6;
-        }
-        else
-        {
-            dayOfTheWeek--;
-        }
-    }
-    
-    //change current month.
-    if(m_activeMonth == 0)
-    {
-        m_activeMonth = 11;
-        m_activeYear--;
-    }
-    else
-    {
-        m_activeMonth--;
-    }
-    m_monthLabel.setString(getMonthString(m_activeMonth) + " " + convertIntToString(m_activeYear));
-    
-    int daysInLastMonth = 0;
-    if(m_activeMonth != 0)
-    {
-        daysInLastMonth = getDaysInMonth(m_activeMonth - 1, m_activeYear);
-    }
-    else
-    {
-        daysInLastMonth = getDaysInMonth(11, m_activeYear - 1);
-    }
-    int daysInThisMonth = getDaysInMonth(m_activeMonth, m_activeYear);
-    
-    int iterator = 0;
-    
-    //even without this, the calendar is still accurate. It just looks nicer to have some days from the previous month displayed.
-    if(dayOfTheWeek == 0)
-    {
-        dayOfTheWeek += 7;
-    }
-    
-    //set last month's days.
-    for(int n = daysInLastMonth - (dayOfTheWeek - 1); n <= daysInLastMonth; n++)
-    {
-        m_month[iterator]->SetNumber(n);
-        m_month[iterator]->SetType("inactive");
-        iterator++;
-    }
-    
-    //set this month's days.
-    for(int i = 1; i <= daysInThisMonth; i++)
-    {
-        m_month[iterator]->SetNumber(i);
-        
-        if(i == m_currentDate->tm_mday && m_activeMonth == m_currentDate->tm_mon && m_activeYear == m_currentDate->tm_year + 1900)
-        {
-            m_month[iterator]->SetType("current");
-        }
-        else
-        {
-            m_month[iterator]->SetType("default");
-        }
-        
-        iterator++;
-    }
-    
-    //set next month's days.
-    for(int r = 1; iterator < m_month.size(); r++)
-    {
-        m_month[iterator]->SetNumber(r);
-        m_month[iterator]->SetType("inactive");
-        iterator++;
-    }
-    
-    //add any persistent events.
-//    for(int p = 0; p < persistentEvents_.size(); p++){
-//        if(persistentEvents_[p]->GetMonth() == activeMonth_){
-//            for(int day = 0; day < month_.size(); day++){
-//                if(month_[day]->GetNumber() == persistentEvents_[p]->GetDay()){
-//                    if(month_[day]->GetType() == "default" || month_[day]->GetType() == "current"){
-//                        month_[day]->AddEvent(persistentEvents_[p]);
-//                    }
-//                }
-//            }
-//        }
-//    }
-    
-    //add any unique events.
-    for(int ue = 0; ue < m_uniqueEvents.size(); ue++)
-    {
-        if(m_uniqueEvents[ue]->GetMonth() == m_activeMonth && m_uniqueEvents[ue]->GetYear() == m_activeYear)
-        {
-            for(int day = 0; day < m_month.size(); day++)
-            {
-                if(m_month[day]->GetNumber() == m_uniqueEvents[ue]->GetDay())
-                {
-                    if(m_month[day]->GetType() == "default" || m_month[day]->GetType() == "current")
-                    {
-                        //month_[day]->AddContent(uniqueEvents_[ue]->GetTitle());
-                        m_month[day]->AddEvent(m_uniqueEvents[ue]);
-                    }
-                }
-            }
-        }
-    }
-}
-
 void Calendar::save()
-{
-    //Save persistent events.
-//    ofstream persistentEventFile;
-//    persistentEventFile.open("./Data/PersistingEvents.cll");
-//
-//    for(int p = 0; p < persistentEventFile.size(); p++)
-//    {
-//        persistentEventFile << RemoveSpaces(persistentEvents_[p]->GetTitle()) << " ";
-//        persistentEventFile <<m_persistentEvents[p]->GetMonth() << " ";
-//        persistentEventFile << persistentEvents_[p]->GetDay() << " ";
-//        persistentEventFile << "\n";
-//    }
-    
-//    persistentEventFile.close();
-    
+{    
     //Save unique events.
     ofstream uniqueEventFile;
     uniqueEventFile.open("./Data/uniqueEvents.cll");

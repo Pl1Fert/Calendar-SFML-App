@@ -1,7 +1,7 @@
 #include "Checkbox.hpp"
 
 Checkbox::Checkbox(string label, int x, int y){
-    font_.loadFromFile("./Data/arial.ttf");
+    font_.loadFromFile("/Users/user/Documents/прога универ/сем 3/Calendar/Calendar/Data/arial.ttf");
 
     label_.setString(label);
     label_.setPosition(x, y);

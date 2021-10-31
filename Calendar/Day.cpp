@@ -6,7 +6,7 @@ Day::Day(int x, int y, sf::Font* font){
     yPos_ = y;
     
     dayRect_.setPosition(x, y);
-    dayRect_.setSize(sf::Vector2f(106, 56));
+    dayRect_.setSize(sf::Vector2f(150, 80));
     dayRect_.setOutlineThickness(2);
     dayRect_.setOutlineColor(sf::Color(000, 000, 000));
     
