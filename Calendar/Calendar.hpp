@@ -12,7 +12,6 @@
 #include "Day.hpp"
 #include "Event.hpp"
 #include "TextField.hpp"
-#include "Checkbox.hpp"
 
 class Calendar
 {
@@ -54,8 +53,6 @@ private:
     TextField* m_targetTextField;
     TextField* m_titleField;
     
-    Checkbox* m_typeBox;
-    
     Calendar();
     ~Calendar();
     
@@ -76,7 +73,6 @@ private:
     void constructMonth();
     void drawMonth();
     void handleInput(sf::Event*);
-    
     void nextMonth();
     void prevMonth();
     void save();
@@ -89,8 +85,5 @@ public:
     int getDaysInMonth(int, int);
     Day* getClickedDay(int, int);
     
-    
     void run();
-    
-    
 };

@@ -20,7 +20,6 @@ private:
     bool m_isSelected;
     
     std::vector<Event*> m_events;
-    
 public:
     Day(int, int, sf::Font*);
     ~Day();

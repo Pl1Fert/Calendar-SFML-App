@@ -24,7 +24,7 @@ Day::Day(int xPos, int yPos, sf::Font* font)
         m_dayContent[i]->setFont(*font);
         m_dayContent[i]->setFillColor(sf::Color::Black);
         m_dayContent[i]->setCharacterSize(20);
-        m_dayContent[i]->setPosition(m_xPos + 20, m_yPos + 1 + (11 * i));
+        m_dayContent[i]->setPosition(m_xPos + 20, m_yPos + 1 + (21 * i));
     }
     
     m_type = "default";

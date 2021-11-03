@@ -13,11 +13,11 @@ TextField::TextField(std::string type, std::string label, int xPos, int yPos)
     m_label.setString(label);
     m_label.setPosition(m_xPos, m_yPos);
     m_label.setFont(m_font);
-    m_label.setCharacterSize(18);
+    m_label.setCharacterSize(24);
     m_label.setFillColor(sf::Color::Black);
     
     m_borderRect.setPosition(m_xPos + m_label.getGlobalBounds().width, m_yPos);
-    m_borderRect.setSize(sf::Vector2f(330, 20));
+    m_borderRect.setSize(sf::Vector2f(550, 40));
     m_borderRect.setOutlineThickness(2);
     m_borderRect.setOutlineColor(sf::Color(000, 000, 000));
     
@@ -25,7 +25,7 @@ TextField::TextField(std::string type, std::string label, int xPos, int yPos)
     m_valueText.setString("");
     m_valueText.setPosition(m_xPos + m_label.getGlobalBounds().width + 4, m_yPos + 1);
     m_valueText.setFont(m_font);
-    m_valueText.setCharacterSize(16);
+    m_valueText.setCharacterSize(24);
     m_valueText.setFillColor(sf::Color::Black);
 }
 
