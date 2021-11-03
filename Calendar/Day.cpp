@@ -1,106 +1,139 @@
-#include "Calendar.hpp"
 #include "Day.hpp"
 
-Day::Day(int x, int y, sf::Font* font){
-    xPos_ = x;
-    yPos_ = y;
+Day::Day(int xPos, int yPos, sf::Font* font)
+{
+    m_xPos = xPos;
+    m_yPos = yPos;
     
-    dayRect_.setPosition(x, y);
-    dayRect_.setSize(sf::Vector2f(150, 80));
-    dayRect_.setOutlineThickness(2);
-    dayRect_.setOutlineColor(sf::Color(000, 000, 000));
+    m_dayRect.setPosition(xPos, yPos);
+    m_dayRect.setSize(sf::Vector2f(220, 97));
+    m_dayRect.setOutlineThickness(2);
+    m_dayRect.setOutlineColor(sf::Color(000, 000, 000));
     
-    numText_.setString("");
-    numText_.setFont(*font);
-    numText_.setPosition(xPos_ + 3, yPos_ + 1);
-    numText_.setFillColor(sf::Color::Black);
-    numText_.setCharacterSize(12);
-    numText_.setStyle(sf::Text::Bold);
+    m_numText.setString("");
+    m_numText.setFont(*font);
+    m_numText.setPosition(m_xPos + 3, m_yPos + 1);
+    m_numText.setFillColor(sf::Color::Black);
+    m_numText.setCharacterSize(24);
+    m_numText.setStyle(sf::Text::Bold);
     
-    for(int i = 0; i < 5; i++){
-        dayContent_.push_back(new sf::Text());
-        dayContent_[i]->setString("");
-        dayContent_[i]->setFont(*font);
-        dayContent_[i]->setFillColor(sf::Color::Black);
-        dayContent_[i]->setCharacterSize(10);
-        dayContent_[i]->setPosition(xPos_ + 20, yPos_ + 1 + (11 * i));
+    for(int i = 0; i < 4; i++)
+    {
+        m_dayContent.push_back(new sf::Text());
+        m_dayContent[i]->setString("");
+        m_dayContent[i]->setFont(*font);
+        m_dayContent[i]->setFillColor(sf::Color::Black);
+        m_dayContent[i]->setCharacterSize(20);
+        m_dayContent[i]->setPosition(m_xPos + 20, m_yPos + 1 + (11 * i));
     }
     
-    type_ = "default";
+    m_type = "default";
 }
 
-Day::~Day(){
-
+Day::~Day()
+{
 }
 
-int Day::GetNumber(){return number_;}
-string Day::GetType(){return type_;}
-int Day::GetX(){return xPos_;}
-int Day::GetY(){return yPos_;}
-vector<Event*>* Day::GetEvents(){return &events_;}
+int Day::getNumber()
+{
+    return m_number;
+}
 
-Event* Day::GetClickedEvent(int clickX, int clickY){
+std::string Day::getType()
+{
+    return m_type;
+}
+
+int Day::getX()
+{
+    return m_xPos;
+}
+
+int Day::getY()
+{
+    return m_yPos;
+}
+
+std::vector<Event*>* Day::getEvents()
+{
+    return &m_events;
+}
+
+Event* Day::getClickedEvent(int clickX, int clickY)
+{
     Event* result = NULL;
     
-    for(int e = 0; e < events_.size(); e++){
-        if(clickX >= events_[e]->GetEventText()->getPosition().x
-        && clickX < events_[e]->GetEventText()->getPosition().x + events_[e]->GetEventText()->getGlobalBounds().width
-        && clickY >= events_[e]->GetEventText()->getPosition().y
-        && clickY < events_[e]->GetEventText()->getPosition().y + events_[e]->GetEventText()->getGlobalBounds().height + 5){
-            result = events_[e];
+    for(int e = 0; e < m_events.size(); e++)
+    {
+        if(clickX >= m_events[e]->getEventText()->getPosition().x && clickX < m_events[e]->getEventText()->getPosition().x
+           + m_events[e]->getEventText()->getGlobalBounds().width && clickY >= m_events[e]->getEventText()->getPosition().y
+           && clickY < m_events[e]->getEventText()->getPosition().y + m_events[e]->getEventText()->getGlobalBounds().height + 5)
+        {
+            result = m_events[e];
         }
     }
     
     return result;
 }
 
-void Day::SetNumber(int num){
-    number_ = num;
+void Day::setNumber(int number)
+{
+    m_number = number;
     
-    string numString;
-    stringstream ss;
-    ss << number_;
-    numString = ss.str();
+    std::string numString;
+    numString = std::to_string(m_number);
     
-    numText_.setString(numString);
+    m_numText.setString(numString);
 }
 
-void Day::SetType(string type){
-    type_ = type;
+void Day::setType(std::string type)
+{
+    m_type = type;
     
-    if(type_ == "default"){
-        dayRect_.setFillColor(sf::Color(255, 255, 255));
-    } else
-    if(type_ == "current"){
-        dayRect_.setFillColor(sf::Color(98, 220, 123));
-    } else
-    if(type_ == "inactive"){
-        dayRect_.setFillColor(sf::Color(174, 174, 174));
+    if(m_type == "default")
+    {
+        m_dayRect.setFillColor(sf::Color(255, 255, 255));
+    }
+    else if(m_type == "current")
+    {
+        m_dayRect.setFillColor(sf::Color(98, 220, 123));
+    }
+    else if(m_type == "inactive")
+    {
+        m_dayRect.setFillColor(sf::Color(174, 174, 174));
     }
 }
 
-void Day::SetSelected(bool selected){
-    selected_ = selected;
+void Day::setSelected(bool isSelected)
+{
+    m_isSelected = isSelected;
     
-    if(selected_ == true){
-        dayRect_.setOutlineColor(sf::Color(38, 188, 00));
-    } else{
-        dayRect_.setOutlineColor(sf::Color(000, 000, 000));
+    if(m_isSelected == true)
+    {
+        m_dayRect.setOutlineColor(sf::Color(38, 188, 00));
+    }
+    else
+    {
+        m_dayRect.setOutlineColor(sf::Color(000, 000, 000));
     }
 }
 
-void Day::AddEvent(Event* event){
-    events_.push_back(event);
-    RefreshContent();
+void Day::addEvent(Event* event)
+{
+    m_events.push_back(event);
+    refreshContent();
 }
 
-bool Day::DeleteEvent(Event* event){
+bool Day::deleteEvent(Event* event)
+{
     bool result = false;
 
-    for(int e = 0; e < events_.size(); e++){
-        if(events_[e] == event){
-            events_.erase(events_.begin() + e);
-            RefreshContent();
+    for(int e = 0; e < m_events.size(); e++)
+    {
+        if(m_events[e] == event)
+        {
+            m_events.erase(m_events.begin() + e);
+            refreshContent();
             result = true;
         }
     }
@@ -108,89 +141,88 @@ bool Day::DeleteEvent(Event* event){
     return result;
 }
 
-void Day::RefreshContent(){
-    for(int i = 0; i < dayContent_.size(); i++){
-        dayContent_[i]->setString("");
+void Day::refreshContent()
+{
+    for(int i = 0; i < m_dayContent.size(); i++)
+    {
+        m_dayContent[i]->setString("");
     }
-
-    if(events_.size() <= 5){
-        for(int e = 0; e < events_.size(); e++){
-            string content = "- ";
-            string title = events_[e]->GetTitle();
-            
-            for(int c = 0; c < title.length(); c++){
-                if(dayContent_[e]->getGlobalBounds().width <= 80){
-                    content += title[c];
-                    dayContent_[e]->setString(content);
-                }
-            }
-            
-            if(events_[e]->GetType() == "unique"){
-                dayContent_[e]->setFillColor(sf::Color::Black);
-            } else
-            if(events_[e]->GetType() == "persistent"){
-                dayContent_[e]->setFillColor(sf::Color::Blue);
-            }
-        }
-    } else{
-        for(int e = 0; e < 5; e++){
-            string content = "- ";
-            string title = events_[e]->GetTitle();
-            
-            for(int c = 0; c < title.length(); c++){
-                if(dayContent_[e]->getGlobalBounds().width <= 80){
-                    content += title[c];
-                    dayContent_[e]->setString(content);
-                }
-            }
-            
-            if(events_[e]->GetType() == "unique"){
-                dayContent_[e]->setFillColor(sf::Color::Black);
-            } else
-            if(events_[e]->GetType() == "persistent"){
-                dayContent_[e]->setFillColor(sf::Color::Blue);
-            }
-        }
-    }
-}
-
-void Day::ClearContent(){
-    events_.clear();
     
-    for(int i = 0; i < dayContent_.size(); i++){
-        dayContent_[i]->setString("");
+    int size = 0;
+    if(m_events.size() <= 4)
+    {
+        size = m_events.size();
+    }
+    else if(m_events.size() > 4)
+    {
+        size = 4;
+    }
+    
+    for(int e = 0; e < size; e++)
+    {
+        std::string content = "- ";
+        std::string title = m_events[e]->getTitle();
+        
+        for(int c = 0; c < title.length(); c++)
+        {
+            if(m_dayContent[e]->getGlobalBounds().width <= 80)
+            {
+                content += title[c];
+                m_dayContent[e]->setString(content);
+            }
+        }
+        
+        if(m_events[e]->getType() == "unique")
+        {
+            m_dayContent[e]->setFillColor(sf::Color::Black);
+        }
     }
 }
 
-void Day::UpdateEventTextColor(Event* targetEvent){
+void Day::clearContent()
+{
+    m_events.clear();
+    
+    for(int i = 0; i < m_dayContent.size(); i++)
+    {
+        m_dayContent[i]->setString("");
+    }
+}
+
+void Day::updateEventTextColor(Event* targetEvent)
+{
     //Set the text of all of this day's events to the default color.
-    for(int e = 0; e < events_.size(); e++){
-        if(events_[e]->GetType() == "unique"){
-            events_[e]->GetEventText()->setFillColor(sf::Color::Black);
-        } else
-        if(events_[e]->GetType() == "persistent"){
-            events_[e]->GetEventText()->setFillColor(sf::Color::Blue);
+    for(int e = 0; e < m_events.size(); e++)
+    {
+        if(m_events[e]->getType() == "unique")
+        {
+            m_events[e]->getEventText()->setFillColor(sf::Color::Black);
         }
     }
     
     //Change the target event's text color.
-    if(targetEvent != NULL){
-        targetEvent->GetEventText()->setFillColor(sf::Color(56, 188, 0, 255));
+    if(targetEvent != NULL)
+    {
+        targetEvent->getEventText()->setFillColor(sf::Color(56, 188, 0, 255));
     }
 }
 
-void Day::Draw(sf::RenderWindow* window){
-    window->draw(dayRect_);
-    window->draw(numText_);
+void Day::draw(sf::RenderWindow* window)
+{
+    window->draw(m_dayRect);
+    window->draw(m_numText);
     
-    for(int i = 0; i < dayContent_.size(); i++){
-        window->draw(*dayContent_[i]);
+    for(int i = 0; i < m_dayContent.size(); i++)
+    {
+        window->draw(*m_dayContent[i]);
     }
 }
 
-void Day::DrawEvents(sf::RenderWindow* window){
-    for(int i = 0; i < events_.size(); i++){
-        events_[i]->Draw(window, i);
+void Day::drawEvents(sf::RenderWindow* window)
+{
+    for(int i = 0; i < m_events.size(); i++)
+    {
+        m_events[i]->draw(window, i);
     }
 }
 

@@ -6,8 +6,6 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 
-using namespace std;
-
 class CheckboxOption{
     private:
     sf::RectangleShape box_;

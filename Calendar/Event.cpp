@@ -1,44 +1,69 @@
 #include "Event.hpp"
 #include "Calendar.hpp"
 
-Event::Event(string title, int month, int day, int year)
+Event::Event(std::string title, int month, int day, int year)
 {
-    type_ = "unique";
-    title_ = title;
-    month_ = month;
-    day_ = day;
-    year_ = year;
+    m_type = "unique";
+    m_title = title;
+    m_month = month;
+    m_day = day;
+    m_year = year;
     
-    eventText_.setString("- " + title_);
-    eventText_.setFillColor(sf::Color::Black);
-    eventText_.setCharacterSize(16);
+    m_eventText.setString("- " + m_title);
+    m_eventText.setFillColor(sf::Color::Black);
+    m_eventText.setCharacterSize(24);
 }
 
-Event::Event(string title, int month, int day){
-    type_ = "persistent";
-    title_ = title;
-    month_ = month;
-    day_ = day;
-    year_ = -1;
+Event::Event(std::string title, int month, int day)
+{
+    m_type = "persistent";
+    m_title = title;
+    m_month = month;
+    m_day = day;
+    m_year = -1;
     
-    eventText_.setString("- " + title_);
-    eventText_.setFillColor(sf::Color::Blue);
-    eventText_.setCharacterSize(16);
+    m_eventText.setString("- " + m_title);
+    m_eventText.setFillColor(sf::Color::Blue);
+    m_eventText.setCharacterSize(16);
 }
 
 Event::~Event()
 {
 }
 
-string Event::GetType(){return type_;}
-string Event::GetTitle(){return title_;}
-int Event::GetMonth(){return month_;}
-int Event::GetDay(){return day_;}
-int Event::GetYear(){return year_;}
-sf::Text* Event::GetEventText(){return &eventText_;}
+std::string Event::getType()
+{
+    return m_type;
+}
 
-void Event::Draw(sf::RenderWindow* window, int iterator){
-    eventText_.setPosition(420, 470 + (20 * iterator));
-    eventText_.setFont(*Calendar::getInstance()->getFont());
-    window->draw(eventText_);
+std::string Event::getTitle()
+{
+    return m_title;
+}
+
+int Event::getMonth()
+{
+    return m_month;
+}
+
+int Event::getDay()
+{
+    return m_day;
+}
+
+int Event::getYear()
+{
+    return m_year;
+}
+
+sf::Text* Event::getEventText()
+{
+    return &m_eventText;
+}
+
+void Event::draw(sf::RenderWindow* window, int iterator)
+{
+    m_eventText.setPosition(420, 470 + (20 * iterator));
+    m_eventText.setFont(*Calendar::getInstance()->getFont());
+    window->draw(m_eventText);
 }

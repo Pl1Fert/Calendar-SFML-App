@@ -1,78 +1,103 @@
 #include "TextField.hpp"
 #include "Calendar.hpp"
 
-TextField::TextField(string type, string label, int x, int y){
-    font_.loadFromFile("/Users/user/Documents/прога универ/сем 3/Calendar/Calendar/Data/arial.ttf");
+TextField::TextField(std::string type, std::string label, int xPos, int yPos)
+{
+    m_font.loadFromFile("/Users/user/Documents/прога универ/сем 3/Calendar/Calendar/Data/arial.ttf");
 
-    type_ = type;
+    m_type = type;
     
-    xPos_ = x;
-    yPos_ = y;
+    m_xPos = xPos;
+    m_yPos = yPos;
     
-    label_.setString(label);
-    label_.setPosition(xPos_, yPos_);
-    label_.setFont(font_);
-    label_.setCharacterSize(18);
-    label_.setFillColor(sf::Color::Black);
+    m_label.setString(label);
+    m_label.setPosition(m_xPos, m_yPos);
+    m_label.setFont(m_font);
+    m_label.setCharacterSize(18);
+    m_label.setFillColor(sf::Color::Black);
     
-    borderRect_.setPosition(xPos_ + label_.getGlobalBounds().width, yPos_);
-    borderRect_.setSize(sf::Vector2f(330, 20));
-    borderRect_.setOutlineThickness(2);
-    borderRect_.setOutlineColor(sf::Color(000, 000, 000));
+    m_borderRect.setPosition(m_xPos + m_label.getGlobalBounds().width, m_yPos);
+    m_borderRect.setSize(sf::Vector2f(330, 20));
+    m_borderRect.setOutlineThickness(2);
+    m_borderRect.setOutlineColor(sf::Color(000, 000, 000));
     
-    value_ = "";
-    valueText_.setString("");
-    valueText_.setPosition(xPos_ + label_.getGlobalBounds().width + 4, yPos_ + 1);
-    valueText_.setFont(font_);
-    valueText_.setCharacterSize(16);
-    valueText_.setFillColor(sf::Color::Black);
+    m_value = "";
+    m_valueText.setString("");
+    m_valueText.setPosition(m_xPos + m_label.getGlobalBounds().width + 4, m_yPos + 1);
+    m_valueText.setFont(m_font);
+    m_valueText.setCharacterSize(16);
+    m_valueText.setFillColor(sf::Color::Black);
 }
 
-TextField::~TextField(){
-
+TextField::~TextField()
+{
 }
 
-sf::RectangleShape* TextField::GetRect(){return &borderRect_;}
-string TextField::GetValue(){return value_;}
+sf::RectangleShape* TextField::getRect()
+{
+    return &m_borderRect;
+}
 
-void TextField::HandleInput(sf::Event* event){
-    if(type_ == "text"){
-        if(event->type == sf::Event::TextEntered && (event->text.unicode >= 32 && event->text.unicode <= 126)){
-            if(valueText_.getGlobalBounds().width <= 334 - 16){
-                value_ += static_cast<char>(event->text.unicode);
-                valueText_.setString(value_);
+std::string TextField::getValue()
+{
+    return m_value;
+}
+
+void TextField::handleInput(sf::Event* event){
+    if(m_type == "text")
+    {
+        if(event->type == sf::Event::TextEntered && (event->text.unicode >= 32 && event->text.unicode <= 126))
+        {
+            if(m_valueText.getGlobalBounds().width <= 334 - 16)
+            {
+                m_value += static_cast<char>(event->text.unicode);
+                m_valueText.setString(m_value);
             }
         }
-    } else
-    if(type_ == "number"){
-        if(event->type == sf::Event::TextEntered && (event->text.unicode >= 48 && event->text.unicode <= 57)){
-            if(valueText_.getGlobalBounds().width <= 334 - 16){
-                value_ += static_cast<char>(event->text.unicode);
-                valueText_.setString(value_);
+    }
+    else if(m_type == "number")
+    {
+        if(event->type == sf::Event::TextEntered && (event->text.unicode >= 48 && event->text.unicode <= 57))
+        {
+            if(m_valueText.getGlobalBounds().width <= 334 - 16)
+            {
+                m_value += static_cast<char>(event->text.unicode);
+                m_valueText.setString(m_value);
             }
         }
     }
     
-    if(event->type == sf::Event::KeyPressed){
-        if(event->key.code == sf::Keyboard::BackSpace){
-            value_ = value_.substr(0, value_.length() - 1);
-            valueText_.setString(value_);
+    if(event->type == sf::Event::KeyPressed)
+    {
+        if(event->key.code == sf::Keyboard::BackSpace)
+        {
+            m_value = m_value.substr(0, m_value.length() - 1);
+            m_valueText.setString(m_value);
         }
     }
 }
 
-void TextField::SetValue(string value){
-    value_ = value;
-    valueText_.setString(value_);
+void TextField::setValue(std::string value)
+{
+    m_value = value;
+    m_valueText.setString(value);
 }
 
-void TextField::SetBorder(string type){
-    if(type == "normal"){borderRect_.setOutlineColor(sf::Color(000, 000, 000));} else
-    if(type == "targeted"){borderRect_.setOutlineColor(sf::Color(38, 188, 00));}
+void TextField::setBorder(std::string type)
+{
+    if(type == "normal")
+    {
+        m_borderRect.setOutlineColor(sf::Color(000, 000, 000));
+    }
+    else if(type == "targeted")
+    {
+        m_borderRect.setOutlineColor(sf::Color(38, 188, 00));
+    }
 }
 
-void TextField::Draw(sf::RenderWindow* window){
-    window->draw(label_);
-    window->draw(borderRect_);
-    window->draw(valueText_);
+void TextField::draw(sf::RenderWindow* window)
+{
+    window->draw(m_label);
+    window->draw(m_borderRect);
+    window->draw(m_valueText);
 }

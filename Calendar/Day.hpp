@@ -2,51 +2,46 @@
 
 #include <iostream>
 #include <string>
-#include <sstream>
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 
 #include "Event.hpp"
 
-using namespace std;
-
 class Day
 {
 private:
-    sf::RectangleShape dayRect_;
-    sf::Text numText_;
-    int xPos_, yPos_;
-    int number_;
-    vector<sf::Text*> dayContent_;
-    string type_;
-    bool selected_;
+    sf::RectangleShape m_dayRect;
+    sf::Text m_numText;
+    int m_xPos, m_yPos;
+    int m_number;
+    std::vector<sf::Text*> m_dayContent;
+    std::string m_type;
+    bool m_isSelected;
     
-    vector<Event*> events_;
+    std::vector<Event*> m_events;
     
-    public:
+public:
     Day(int, int, sf::Font*);
     ~Day();
     
-    int GetX();
-    int GetY();
-    int GetNumber();
-    string GetType();
+    int getX();
+    int getY();
+    int getNumber();
+    std::string getType();
     
-    vector<Event*>* GetEvents();
-    Event* GetClickedEvent(int, int);
+    std::vector<Event*>* getEvents();
+    Event* getClickedEvent(int, int);
     
-    void SetNumber(int);
-    void SetType(string);
-    void SetSelected(bool);
-    void AddEvent(Event*);
-    bool DeleteEvent(Event*);
-    void RefreshContent();
-    void ClearContent();
-    void UpdateEventTextColor(Event*);
-    void Draw(sf::RenderWindow*);
-    void DrawEvents(sf::RenderWindow*);
-
-
+    void setNumber(int);
+    void setType(std::string);
+    void setSelected(bool);
+    void addEvent(Event*);
+    bool deleteEvent(Event*);
+    void refreshContent();
+    void clearContent();
+    void updateEventTextColor(Event*);
+    void draw(sf::RenderWindow*);
+    void drawEvents(sf::RenderWindow*);
 };
 

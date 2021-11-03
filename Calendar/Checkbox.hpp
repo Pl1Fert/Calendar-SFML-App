@@ -9,8 +9,6 @@
 
 #include "CheckboxOption.hpp"
 
-using namespace std;
-
 class Checkbox{
     private:
     sf::Font font_;

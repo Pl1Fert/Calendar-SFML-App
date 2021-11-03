@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 #include <ctime>
-#include <sstream>
 #include <fstream>
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
@@ -14,7 +13,6 @@
 #include "Event.hpp"
 #include "TextField.hpp"
 #include "Checkbox.hpp"
-#include "ResourcePath.hpp"
 
 class Calendar
 {
@@ -27,14 +25,14 @@ private:
     time_t m_currentTime;
     struct tm* m_currentDate;
     
-    vector<Day*> m_month;
+    std::vector<Day*> m_month;
     Day* m_target;
     Event* m_targetEvent;
     int m_activeMonth;
     int m_activeYear;
     
-    vector<Event*> m_persistentEvents;//убрать нахуй виды эвентов и оставить 1
-    vector<Event*> m_uniqueEvents;
+    std::vector<Event*> m_persistentEvents;//убрать нахуй виды эвентов и оставить 1
+    std::vector<Event*> m_uniqueEvents;
     
     sf::Text m_monthLabel;
     sf::Text m_daysLabel;
@@ -61,14 +59,14 @@ private:
     Calendar();
     ~Calendar();
     
-    string convertIntToString(int);
+    std::string convertIntToString(int);
     void centerText(sf::Text*, int, int, int);
     void updateDayColors();
     bool spriteIncludesPoint(sf::Sprite*, int, int);
     bool rectIncludesPoint(sf::RectangleShape*, int, int);
     
-    string addSpaces(string);
-    string removeSpaces(string);
+    std::string addSpaces(std::string);
+    std::string removeSpaces(std::string);
     
     int getActiveYear();
     int getActiveMonth();
@@ -87,7 +85,7 @@ public:
     static Calendar* getInstance();
     
     sf::Font* getFont();
-    string getMonthString(int);
+    std::string getMonthString(int);
     int getDaysInMonth(int, int);
     Day* getClickedDay(int, int);
     

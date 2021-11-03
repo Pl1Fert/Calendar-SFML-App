@@ -8,32 +8,26 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 
-using namespace std;
-
 class Event
 {
-    private:
-    string type_;
-    string title_;
-    int month_;
-    int day_;
-    int year_;
-    sf::Text eventText_;
-    
-    
-    public:
-    Event(string, int, int, int); //unique event
-    Event(string, int, int); //persisting event
+private:
+    std::string m_type;
+    std::string m_title;
+    int m_month;
+    int m_day;
+    int m_year;
+    sf::Text m_eventText;
+public:
+    Event(std::string, int, int, int); //unique event
+    Event(std::string, int, int); //persisting event
     ~Event();
     
-    string GetType();
-    string GetTitle();
-    int GetMonth();
-    int GetDay();
-    int GetYear();
-    sf::Text* GetEventText();
+    std::string getType();
+    std::string getTitle();
+    int getMonth();
+    int getDay();
+    int getYear();
+    sf::Text* getEventText();
     
-    void Draw(sf::RenderWindow*, int);
-
-
+    void draw(sf::RenderWindow*, int);
 };
