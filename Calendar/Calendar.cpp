@@ -42,21 +42,19 @@ Calendar::Calendar()
     
     m_dividerImage.loadFromFile("/Users/user/Documents/прога универ/сем 3/Calendar/Calendar/Images/Divider.png");
     m_divider.setTexture(m_dividerImage);
-    m_divider.setPosition(800, 748);
+    m_divider.setPosition(680, 778);
     m_selectedDay.setString("");
-//    m_selectedDay.setString(setMonthString(std::to_string(m_currentDate->tm_mon), std::to_string(m_currentDate->tm_mday), std::to_string(m_currentDate->tm_year)));
-//    centerText(&m_selectedDay, 0, 800, 740);
     m_selectedDay.setFont(m_font);
     m_selectedDay.setFillColor(sf::Color::Black);
     m_selectedDay.setCharacterSize(24);
     m_selectedDay.setStyle(sf::Text::Bold);
     
-    m_deleteButtonImage.loadFromFile("/Users/user/Documents/прога универ/сем 3/Calendar/Calendar/Images/DeleteButton2.png");
+    m_deleteButtonImage.loadFromFile("/Users/user/Documents/прога универ/сем 3/Calendar/Calendar/Images/DeleteButton.png");
     m_deleteButton.setTexture(m_deleteButtonImage);
     
-    m_addNoteButtonImage.loadFromFile("/Users/user/Documents/прога универ/сем 3/Calendar/Calendar/Images/AddNote.png");
+    m_addNoteButtonImage.loadFromFile("/Users/user/Documents/прога универ/сем 3/Calendar/Calendar/Images/AddButton.png");
     m_addNoteButton.setTexture(m_addNoteButtonImage);
-    m_addNoteButton.setPosition(300, 810);
+    m_addNoteButton.setPosition(250, 840);
     
     m_targetTextField = NULL;
     m_addNote.setString("Add a note: ");
@@ -590,7 +588,7 @@ void Calendar::handleInput(sf::Event* event)
                 updateDayColors();
                 
                 m_selectedDay.setString(buf);
-                centerText(&m_selectedDay, 0, 800, 740);
+                centerText(&m_selectedDay, 0, 1600, 740);
             }
             
             if(m_target != NULL)

@@ -44,7 +44,7 @@ sf::Text* Event::getEventText()
 
 void Event::draw(sf::RenderWindow* window, int iterator)
 {
-    m_eventText.setPosition(920, 770 + (25 * iterator));
+    m_eventText.setPosition(830, 790 + (25 * iterator));
     m_eventText.setFont(m_font);
     window->draw(m_eventText);
 }

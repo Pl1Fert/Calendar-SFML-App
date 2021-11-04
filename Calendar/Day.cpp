@@ -165,7 +165,7 @@ void Day::refreshContent()
         
         for(int c = 0; c < title.length(); c++)
         {
-            if(m_dayContent[e]->getGlobalBounds().width <= 80)
+            if(m_dayContent[e]->getGlobalBounds().width <= 130)
             {
                 content += title[c];
                 m_dayContent[e]->setString(content);
