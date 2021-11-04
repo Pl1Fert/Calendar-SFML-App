@@ -9,13 +9,13 @@
 class TextField
 {
 private:
-    sf::Font m_font;
+    std::string m_value;
     std::string m_type;
     int m_xPos, m_yPos;
     sf::Text m_label;
-    sf::RectangleShape m_borderRect;
-    std::string m_value;
     sf::Text m_valueText;
+    sf::RectangleShape m_borderRect;
+    sf::Font m_font;
 public:
     TextField(std::string, std::string, int, int);
     ~TextField();

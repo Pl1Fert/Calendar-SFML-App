@@ -1,39 +1,20 @@
 #include "Event.hpp"
-#include "Calendar.hpp"
 
 Event::Event(std::string title, int month, int day, int year)
 {
-    m_type = "unique";
     m_title = title;
     m_month = month;
     m_day = day;
     m_year = year;
+    m_font.loadFromFile("/Users/user/Documents/прога универ/сем 3/Calendar/Calendar/Data/arial.ttf");
     
     m_eventText.setString("- " + m_title);
     m_eventText.setFillColor(sf::Color::Black);
     m_eventText.setCharacterSize(24);
 }
 
-Event::Event(std::string title, int month, int day)
-{
-    m_type = "persistent";
-    m_title = title;
-    m_month = month;
-    m_day = day;
-    m_year = -1;
-    
-    m_eventText.setString("- " + m_title);
-    m_eventText.setFillColor(sf::Color::Blue);
-    m_eventText.setCharacterSize(16);
-}
-
 Event::~Event()
 {
-}
-
-std::string Event::getType()
-{
-    return m_type;
 }
 
 std::string Event::getTitle()
@@ -63,7 +44,7 @@ sf::Text* Event::getEventText()
 
 void Event::draw(sf::RenderWindow* window, int iterator)
 {
-    m_eventText.setPosition(420, 470 + (20 * iterator));
-    m_eventText.setFont(*Calendar::getInstance()->getFont());
+    m_eventText.setPosition(920, 770 + (25 * iterator));
+    m_eventText.setFont(m_font);
     window->draw(m_eventText);
 }

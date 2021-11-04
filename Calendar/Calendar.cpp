@@ -44,9 +44,11 @@ Calendar::Calendar()
     m_divider.setTexture(m_dividerImage);
     m_divider.setPosition(800, 748);
     m_selectedDay.setString("");
+//    m_selectedDay.setString(setMonthString(std::to_string(m_currentDate->tm_mon), std::to_string(m_currentDate->tm_mday), std::to_string(m_currentDate->tm_year)));
+//    centerText(&m_selectedDay, 0, 800, 740);
     m_selectedDay.setFont(m_font);
     m_selectedDay.setFillColor(sf::Color::Black);
-    m_selectedDay.setCharacterSize(16);
+    m_selectedDay.setCharacterSize(24);
     m_selectedDay.setStyle(sf::Text::Bold);
     
     m_deleteButtonImage.loadFromFile("/Users/user/Documents/прога универ/сем 3/Calendar/Calendar/Images/DeleteButton2.png");
@@ -64,8 +66,8 @@ Calendar::Calendar()
     m_addNote.setCharacterSize(24);
     m_addNote.setStyle(sf::Text::Bold);
     m_titleField = new TextField("text", "Note: ", 10, 775);//координаты
-    
-    loadUniqueEvents();
+        
+    loadEvents();
     constructMonth();
 }
 
@@ -91,7 +93,7 @@ void Calendar::run()
         {
             if(m_event.type == sf::Event::Closed)
             {
-                save();
+                saveEvents();
                 m_window.close();
             }
             
@@ -170,7 +172,6 @@ void Calendar::updateDayColors()
     {
         m_target->setSelected(true);
     }
-    
 }
 
 bool Calendar::spriteIncludesPoint(sf::Sprite* sprite, int x, int y)
@@ -221,10 +222,10 @@ std::string Calendar::removeSpaces(std::string str)
     return str;
 }
 
-void Calendar::loadUniqueEvents()
+void Calendar::loadEvents()
 {
     std::ifstream file;
-    file.open("/Users/user/Documents/прога универ/сем 3/Calendar/Calendar/Data/UniqueEvents.cll");
+    file.open("/Users/user/Documents/прога универ/сем 3/Calendar/Calendar/Data/AllEvents.cll");
     
     std::string title = "";
     int month = 0, day = 0, year = 0;
@@ -235,7 +236,26 @@ void Calendar::loadUniqueEvents()
         file >> day;
         file >> year;
         
-        m_uniqueEvents.push_back(new Event(addSpaces(title), month, day, year));
+        m_allEvents.push_back(new Event(addSpaces(title), month, day, year));
+    }
+    
+    file.close();
+}
+
+
+void Calendar::saveEvents()
+{
+    //Save events
+    std::ofstream file;
+    file.open("/Users/user/Documents/прога универ/сем 3/Calendar/Calendar/Data/AllEvents.cll");
+
+    for(int i = 0; i < m_allEvents.size(); i++)
+    {
+        file << removeSpaces(m_allEvents[i]->getTitle()) << " ";
+        file << m_allEvents[i]->getMonth() << " ";
+        file << m_allEvents[i]->getDay() << " ";
+        file << m_allEvents[i]->getYear() << " ";
+        file << "\n";
     }
     
     file.close();
@@ -243,16 +263,11 @@ void Calendar::loadUniqueEvents()
 
 void Calendar::deleteEvent(Event* event)
 {
-    std::string type = event->getType();
-    
-    if(type == "unique")
+    for(int e = 0; e < m_allEvents.size(); e++)
     {
-        for(int p = 0; p < m_uniqueEvents.size(); p++)
+        if(m_allEvents[e] == event)
         {
-            if(m_uniqueEvents[p] == event)
-            {
-                m_uniqueEvents.erase(m_uniqueEvents.begin() + p);
-            }
+            m_allEvents.erase(m_allEvents.begin() + e);
         }
     }
 }
@@ -294,6 +309,7 @@ void Calendar::drawMonth()
     {
         daysInLastMonth = getDaysInMonth(11, m_activeYear - 1);
     }
+    
     int daysInThisMonth = getDaysInMonth(m_activeMonth, m_activeYear);
     
     int iterator = 0;
@@ -304,9 +320,9 @@ void Calendar::drawMonth()
     }
     
     //set last month's days.
-    for(int n = daysInLastMonth - (dayOfTheWeek-1); n <= daysInLastMonth; n++)
+    for(int i = daysInLastMonth - (dayOfTheWeek-1); i <= daysInLastMonth; i++)
     {
-        m_month[iterator]->setNumber(n);
+        m_month[iterator]->setNumber(i);
         m_month[iterator]->setType("inactive");
         iterator++;
     }
@@ -329,25 +345,25 @@ void Calendar::drawMonth()
     }
     
     //set next month's days.
-    for(int r = 1; iterator < m_month.size(); r++)
+    for(int i = 1; iterator < m_month.size(); i++)
     {
-        m_month[iterator]->setNumber(r);
+        m_month[iterator]->setNumber(i);
         m_month[iterator]->setType("inactive");
         iterator++;
     }
             
-    //add any unique events
-    for(int ue = 0; ue < m_uniqueEvents.size(); ue++)
+    //add events
+    for(int e = 0; e < m_allEvents.size(); e++)
     {
-        if(m_uniqueEvents[ue]->getMonth() == m_activeMonth && m_uniqueEvents[ue]->getYear() == m_activeYear)
+        if(m_allEvents[e]->getMonth() == m_activeMonth && m_allEvents[e]->getYear() == m_activeYear)
         {
             for(int day = 0; day < m_month.size(); day++)
             {
-                if(m_month[day]->getNumber() == m_uniqueEvents[ue]->getDay())
+                if(m_month[day]->getNumber() == m_allEvents[e]->getDay())
                 {
                     if(m_month[day]->getType() == "default" || m_month[day]->getType() == "current")
                     {
-                        m_month[day]->addEvent(m_uniqueEvents[ue]);
+                        m_month[day]->addEvent(m_allEvents[e]);
                     }
                 }
             }
@@ -398,9 +414,9 @@ void Calendar::constructMonth()
     int iterator = 0;
     
     //set last month's days.
-    for(int n = daysInLastMonth - (dayOfTheWeek); n <= daysInLastMonth; n++)
+    for(int i = daysInLastMonth - (dayOfTheWeek); i <= daysInLastMonth; i++)
     {
-        m_month[iterator]->setNumber(n);
+        m_month[iterator]->setNumber(i);
         m_month[iterator]->setType("inactive");
         iterator++;
     }
@@ -430,18 +446,17 @@ void Calendar::constructMonth()
         iterator++;
     }
         
-    //add any unique events.
-    for(int ue = 0; ue < m_uniqueEvents.size(); ue++)
+    for(int e = 0; e < m_allEvents.size(); e++)
     {
-        if(m_uniqueEvents[ue]->getMonth() == m_activeMonth && m_uniqueEvents[ue]->getYear() == m_activeYear)
+        if(m_allEvents[e]->getMonth() == m_activeMonth && m_allEvents[e]->getYear() == m_activeYear)
         {
             for(int day = 0; day < m_month.size(); day++)
             {
-                if(m_month[day]->getNumber() == m_uniqueEvents[ue]->getDay())
+                if(m_month[day]->getNumber() == m_allEvents[e]->getDay())
                 {
                     if(m_month[day]->getType() == "default" || m_month[day]->getType() == "current")
                     {
-                        m_month[day]->addEvent(m_uniqueEvents[ue]);
+                        m_month[day]->addEvent(m_allEvents[e]);
                     }
                 }
             }
@@ -449,17 +464,22 @@ void Calendar::constructMonth()
     }
 }
 
-void Calendar::nextMonth()
+void Calendar::prepBeforeMonthChange()
 {
     m_target = NULL;
     m_targetEvent = NULL;
     m_targetTextField = NULL;
     
     //clear all content
-    for(int yad = 0; yad < m_month.size(); yad++)
+    for(int d = 0; d < m_month.size(); d++)
     {
-        m_month[yad]->clearContent();
+        m_month[d]->clearContent();
     }
+}
+
+void Calendar::nextMonth()
+{
+    prepBeforeMonthChange();
         
     if(m_activeMonth == 11)
     {
@@ -476,15 +496,7 @@ void Calendar::nextMonth()
 
 void Calendar::prevMonth()
 {
-    m_target = NULL;
-    m_targetEvent = NULL;
-    m_targetTextField = NULL;
-
-    //clear all content
-    for(int yad = 0; yad < m_month.size(); yad++)
-    {
-        m_month[yad]->clearContent();
-    }
+    prepBeforeMonthChange();
     
     //change current month.
     if(m_activeMonth == 0)
@@ -572,11 +584,8 @@ void Calendar::handleInput(sf::Event* event)
                     targetsYear = convertIntToString(m_activeYear);
                 }
                 
-                std::string buf = targetsMonth;
-                buf += " ";
-                buf += convertIntToString(m_target->getNumber());
-                buf += " ";
-                buf += targetsYear;
+                std::string number = convertIntToString(m_target->getNumber());
+                std::string buf = setMonthString(targetsMonth, number, targetsYear);
                 
                 updateDayColors();
                 
@@ -593,7 +602,7 @@ void Calendar::handleInput(sf::Event* event)
                     m_titleField->setBorder("normal");
                     m_targetEvent = clickedEvent;
                     m_target->updateEventTextColor(clickedEvent);
-                    m_deleteButton.setPosition(420 + clickedEvent->getEventText()->getGlobalBounds().width + 4, clickedEvent->getEventText()->getPosition().y);
+                    m_deleteButton.setPosition(1000 + clickedEvent->getEventText()->getGlobalBounds().width + 4, clickedEvent->getEventText()->getPosition().y);
                 }
             }
             
@@ -605,7 +614,7 @@ void Calendar::handleInput(sf::Event* event)
                     if(m_titleField->getValue() != "")
                     {
                         Event* newEvent = new Event(m_titleField->getValue(), m_activeMonth, m_target->getNumber(), m_activeYear);
-                        m_uniqueEvents.push_back(newEvent);
+                        m_allEvents.push_back(newEvent);
                         m_target->addEvent(newEvent);
                         m_titleField->setValue("");
                     }
@@ -649,7 +658,7 @@ void Calendar::handleInput(sf::Event* event)
                 if(m_titleField->getValue() != "")
                 {
                     Event* newEvent = new Event(m_titleField->getValue(), m_activeMonth, m_target->getNumber(), m_activeYear);
-                    m_uniqueEvents.push_back(newEvent);
+                    m_allEvents.push_back(newEvent);
                     m_target->addEvent(newEvent);
                     m_titleField->setValue("");
                 }
@@ -677,23 +686,12 @@ void Calendar::handleInput(sf::Event* event)
         }
     }
 }
-
-void Calendar::save()
-{    
-    //Save unique events.
-    std::ofstream uniqueEventFile;
-    uniqueEventFile.open("/Users/user/Documents/прога универ/сем 3/Calendar/Calendar/Data/UniqueEvents.cll");
-
-    for(int i = 0; i < m_uniqueEvents.size(); i++)
-    {
-        uniqueEventFile << removeSpaces(m_uniqueEvents[i]->getTitle()) << " ";
-        uniqueEventFile << m_uniqueEvents[i]->getMonth() << " ";
-        uniqueEventFile << m_uniqueEvents[i]->getDay() << " ";
-        uniqueEventFile << m_uniqueEvents[i]->getYear() << " ";
-        uniqueEventFile << "\n";
-    }
+                                                 
+std::string Calendar::setMonthString(std::string month, std::string day, std::string year)
+{
+    std::string buf = month + " " + day + " " + year;
     
-    uniqueEventFile.close();
+    return buf;
 }
 
 sf::Font* Calendar::getFont()

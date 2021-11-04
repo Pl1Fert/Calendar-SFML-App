@@ -172,10 +172,7 @@ void Day::refreshContent()
             }
         }
         
-        if(m_events[e]->getType() == "unique")
-        {
-            m_dayContent[e]->setFillColor(sf::Color::Black);
-        }
+        m_dayContent[e]->setFillColor(sf::Color::Black);
     }
 }
 
@@ -194,10 +191,7 @@ void Day::updateEventTextColor(Event* targetEvent)
     //Set the text of all of this day's events to the default color.
     for(int e = 0; e < m_events.size(); e++)
     {
-        if(m_events[e]->getType() == "unique")
-        {
-            m_events[e]->getEventText()->setFillColor(sf::Color::Black);
-        }
+        m_events[e]->getEventText()->setFillColor(sf::Color::Black);
     }
     
     //Change the target event's text color.

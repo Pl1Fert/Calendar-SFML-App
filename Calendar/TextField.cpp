@@ -1,5 +1,4 @@
 #include "TextField.hpp"
-#include "Calendar.hpp"
 
 TextField::TextField(std::string type, std::string label, int xPos, int yPos)
 {
@@ -43,7 +42,8 @@ std::string TextField::getValue()
     return m_value;
 }
 
-void TextField::handleInput(sf::Event* event){
+void TextField::handleInput(sf::Event* event)
+{
     if(m_type == "text")
     {
         if(event->type == sf::Event::TextEntered && (event->text.unicode >= 32 && event->text.unicode <= 126))

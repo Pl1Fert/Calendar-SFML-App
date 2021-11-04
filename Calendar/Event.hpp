@@ -11,18 +11,16 @@
 class Event
 {
 private:
-    std::string m_type;
     std::string m_title;
     int m_month;
     int m_day;
     int m_year;
     sf::Text m_eventText;
+    sf::Font m_font;
 public:
-    Event(std::string, int, int, int); //unique event
-    Event(std::string, int, int); //persisting event
+    Event(std::string, int, int, int);
     ~Event();
     
-    std::string getType();
     std::string getTitle();
     int getMonth();
     int getDay();

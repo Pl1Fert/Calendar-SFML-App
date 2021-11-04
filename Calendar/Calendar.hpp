@@ -1,8 +1,5 @@
 #pragma once
 
-#include <iostream>
-#include <string>
-#include <vector>
 #include <ctime>
 #include <fstream>
 #include <SFML/System.hpp>
@@ -30,8 +27,7 @@ private:
     int m_activeMonth;
     int m_activeYear;
     
-    std::vector<Event*> m_persistentEvents;//убрать нахуй виды эвентов и оставить 1
-    std::vector<Event*> m_uniqueEvents;
+    std::vector<Event*> m_allEvents;
     
     sf::Text m_monthLabel;
     sf::Text m_daysLabel;
@@ -67,15 +63,16 @@ private:
     
     int getActiveYear();
     int getActiveMonth();
-    void loadPersistentEvents();
-    void loadUniqueEvents();
+    void loadEvents();
     void deleteEvent(Event*);
     void constructMonth();
     void drawMonth();
     void handleInput(sf::Event*);
     void nextMonth();
     void prevMonth();
-    void save();
+    void saveEvents();
+    void prepBeforeMonthChange();
+    std::string setMonthString(std::string, std::string, std::string);
     
 public:
     static Calendar* getInstance();
