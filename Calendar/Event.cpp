@@ -22,6 +22,11 @@ std::string Event::getTitle()
     return m_title;
 }
 
+void Event::setTitle(std::string title)
+{
+    m_title = title;
+}
+
 int Event::getMonth()
 {
     return m_month;
@@ -48,3 +53,4 @@ void Event::draw(sf::RenderWindow* window, int iterator)
     m_eventText.setFont(m_font);
     window->draw(m_eventText);
 }
+

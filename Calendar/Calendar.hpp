@@ -32,27 +32,32 @@ private:
     sf::Text m_monthLabel;
     sf::Text m_daysLabel;
     sf::Text m_addNote;
+    sf::Text m_editNote;
     sf::Text m_selectedDay;
     
     sf::Texture m_leftSelectorImage;
     sf::Texture m_rightSelectorImage;
     sf::Texture m_dividerImage;
-    sf::Texture m_deleteButtonImage;
+    sf::Texture m_deleteNoteButtonImage;
     sf::Texture m_addNoteButtonImage;
+    sf::Texture m_editNoteButtonImage;
+    sf::Texture m_secondEditNoteButtonImage;
     
     sf::Sprite m_leftSelector;
     sf::Sprite m_rightSelector;
     sf::Sprite m_divider;
-    sf::Sprite m_deleteButton;
+    sf::Sprite m_deleteNoteButton;
     sf::Sprite m_addNoteButton;
+    sf::Sprite m_editNoteButton;
+    sf::Sprite m_secondEditNoteButton;
     
     TextField* m_targetTextField;
     TextField* m_titleField;
+    TextField* m_editNoteField;
     
     Calendar();
     ~Calendar();
     
-    std::string convertIntToString(int);
     void centerText(sf::Text*, int, int, int);
     void updateDayColors();
     bool spriteIncludesPoint(sf::Sprite*, int, int);
@@ -73,6 +78,7 @@ private:
     void saveEvents();
     void prepBeforeMonthChange();
     std::string setMonthString(std::string, std::string, std::string);
+    void sortEvents();
     
 public:
     static Calendar* getInstance();

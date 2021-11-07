@@ -26,6 +26,7 @@ public:
     int getDay();
     int getYear();
     sf::Text* getEventText();
+    void setTitle(std::string);
     
     void draw(sf::RenderWindow*, int);
 };

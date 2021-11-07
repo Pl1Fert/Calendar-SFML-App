@@ -121,7 +121,22 @@ void Day::setSelected(bool isSelected)
 void Day::addEvent(Event* event)
 {
     m_events.push_back(event);
+    sortEvents();
     refreshContent();
+}
+
+void Day::sortEvents()
+{
+    for(int i = 0; i < m_events.size(); i++)
+    {
+        for (int j = 1 + i; j < m_events.size(); j++)
+        {
+            if(m_events[i]->getTitle() > m_events[j]->getTitle())
+            {
+                std::swap(m_events[i], m_events[j]);
+            }
+        }
+    }
 }
 
 bool Day::deleteEvent(Event* event)

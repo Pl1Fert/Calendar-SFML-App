@@ -40,5 +40,6 @@ public:
     void updateEventTextColor(Event*);
     void draw(sf::RenderWindow*);
     void drawEvents(sf::RenderWindow*);
+    void sortEvents();
 };
 
