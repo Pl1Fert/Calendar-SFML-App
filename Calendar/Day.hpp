@@ -34,12 +34,12 @@ public:
     void setType(std::string);
     void setSelected(bool);
     void addEvent(Event*);
-    bool deleteEvent(Event*);
     void refreshContent();
     void clearContent();
     void updateEventTextColor(Event*);
     void draw(sf::RenderWindow*);
     void drawEvents(sf::RenderWindow*);
     void sortEvents();
+    bool deleteEvent(Event*);
 };
 

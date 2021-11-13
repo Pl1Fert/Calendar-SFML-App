@@ -52,7 +52,7 @@ private:
     sf::Sprite m_secondEditNoteButton;
     
     TextField* m_targetTextField;
-    TextField* m_titleField;
+    TextField* m_addNoteField;
     TextField* m_editNoteField;
     
     Calendar();
@@ -68,25 +68,28 @@ private:
     
     int getActiveYear();
     int getActiveMonth();
-    void loadEvents();
-    void deleteEvent(Event*);
+    
+    void handleInput(sf::Event*);
     void constructMonth();
     void drawMonth();
-    void handleInput(sf::Event*);
     void nextMonth();
     void prevMonth();
-    void saveEvents();
+    void setNextMonthDays(int);
+    int setLastMonthDays(int,int,int);
     void prepBeforeMonthChange();
-    std::string setMonthString(std::string, std::string, std::string);
+    
+    void deleteEvent(Event*);
+    void loadEvents();
     void sortEvents();
-    
-public:
-    static Calendar* getInstance();
-    
+    void addEvents();
+    void saveEvents();
+
     sf::Font* getFont();
     std::string getMonthString(int);
+    std::string setMonthString(std::string, std::string, std::string);
     int getDaysInMonth(int, int);
     Day* getClickedDay(int, int);
-    
+public:
+    static Calendar* getInstance();
     void run();
 };

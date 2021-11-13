@@ -26,7 +26,7 @@ Calendar::Calendar()
     m_monthLabel.setStyle(sf::Text::Bold);
     centerText(&m_monthLabel, 0, 1600, 10);
     
-    m_daysLabel.setString("       Monday            Tuesday          Wednesday        Thursday             Friday             Saturday             Sunday     ");
+    m_daysLabel.setString("       Monday            Tuesday           Wednesday         Thursday             Friday             Saturday             Sunday     ");
     m_daysLabel.setPosition(0, 50);
     m_daysLabel.setFont(m_font);
     m_daysLabel.setFillColor(sf::Color::Black);
@@ -78,7 +78,7 @@ Calendar::Calendar()
     m_editNote.setFillColor(sf::Color::Black);
     m_editNote.setCharacterSize(24);
     m_editNote.setStyle(sf::Text::Bold);
-    m_titleField = new TextField("text", "Note: ", 10, 775);
+    m_addNoteField = new TextField("text", "Note: ", 10, 775);
     m_editNoteField = new TextField("text", "Edit: ", 10, 975);
         
     loadEvents();
@@ -140,7 +140,7 @@ void Calendar::run()
             if(m_target->getType() != "inactive")
             {
                 m_window.draw(m_addNote);
-                m_titleField->draw(&m_window);
+                m_addNoteField->draw(&m_window);
                 m_window.draw(m_addNoteButton);
             }
         }
@@ -161,76 +161,6 @@ void Calendar::run()
         
         m_window.display();
     }
-}
-
-void Calendar::centerText(sf::Text* text, int x1, int x2, int y)
-{
-    int width = text->getGlobalBounds().width;
-    int x = x1 + ((x2 - x1) - width) / 2;
-    text->setPosition(x, y);
-}
-
-void Calendar::updateDayColors()
-{
-    //make all unselected
-    for(int i = 0; i < m_month.size(); i++)
-    {
-        m_month[i]->setSelected(false);
-    }
-    
-    //select target
-    if(m_target != NULL)
-    {
-        m_target->setSelected(true);
-    }
-}
-
-bool Calendar::spriteIncludesPoint(sf::Sprite* sprite, int x, int y)
-{
-    if(x >= sprite->getPosition().x && x < sprite->getPosition().x + sprite->getGlobalBounds().width
-    && y >= sprite->getPosition().y && y < sprite->getPosition().y + sprite->getGlobalBounds().height)
-    {
-        return true;
-    }
-    
-    return false;
-}
-
-bool Calendar::rectIncludesPoint(sf::RectangleShape* rect, int x, int y)
-{
-    if(x >= rect->getPosition().x && x < rect->getPosition().x + rect->getGlobalBounds().width
-    && y >= rect->getPosition().y && y < rect->getPosition().y + rect->getGlobalBounds().height)
-    {
-        return true;
-    }
-    
-    return false;
-}
-
-std::string Calendar::addSpaces(std::string str)
-{
-    for(int c = 0; c < str.length(); c++)
-    {
-        if(str[c] == '_')
-        {
-            str[c] = ' ';
-        }
-    }
-    
-    return str;
-}
-
-std::string Calendar::removeSpaces(std::string str)
-{
-    for(int c = 0; c < str.length(); c++)
-    {
-        if(str[c] == ' ')
-        {
-            str[c] = '_';
-        }
-    }
-    
-    return str;
 }
 
 void Calendar::loadEvents()
@@ -326,6 +256,8 @@ int Calendar::getActiveMonth()
 void Calendar::drawMonth()
 {
     m_monthLabel.setString(getMonthString(m_activeMonth) + " " + std::to_string(m_activeYear));
+    
+    //Tomohiko Sakamoto’s Algorithm
     int currentYear = getActiveYear();
     int currentMonth = getActiveMonth() + 1;
     
@@ -342,16 +274,16 @@ void Calendar::drawMonth()
         dayOfTheWeek = 6;
     
     int daysInLastMonth = 0;
-    if(m_activeMonth != 0)
+    if(getActiveMonth() != 0)
     {
-        daysInLastMonth = getDaysInMonth(m_activeMonth - 1, m_activeYear);
+        daysInLastMonth = getDaysInMonth(getActiveMonth() - 1, getActiveYear());
     }
     else
     {
-        daysInLastMonth = getDaysInMonth(11, m_activeYear - 1);
+        daysInLastMonth = getDaysInMonth(11, getActiveYear() - 1);
     }
     
-    int daysInThisMonth = getDaysInMonth(m_activeMonth, m_activeYear);
+    int daysInThisMonth = getDaysInMonth(getActiveMonth(), getActiveYear());
     
     int iterator = 0;
 
@@ -360,20 +292,14 @@ void Calendar::drawMonth()
         dayOfTheWeek += 7;
     }
     
-    //set last month's days.
-    for(int i = daysInLastMonth - (dayOfTheWeek-1); i <= daysInLastMonth; i++)
-    {
-        m_month[iterator]->setNumber(i);
-        m_month[iterator]->setType("inactive");
-        iterator++;
-    }
+    iterator = setLastMonthDays(daysInLastMonth, (dayOfTheWeek-1), iterator);
     
     //set this month's days.
     for(int i = 1; i <= daysInThisMonth; i++)
     {
         m_month[iterator]->setNumber(i);
         
-        if(i == m_currentDate->tm_mday && m_activeMonth == m_currentDate->tm_mon && m_activeYear == m_currentDate->tm_year + 1900)
+        if(i == m_currentDate->tm_mday && getActiveMonth() == m_currentDate->tm_mon && getActiveYear() == m_currentDate->tm_year + 1900)
         {
             m_month[iterator]->setType("current");
         }
@@ -385,18 +311,27 @@ void Calendar::drawMonth()
         iterator++;
     }
     
-    //set next month's days.
-    for(int i = 1; iterator < m_month.size(); i++)
+    setNextMonthDays(iterator);
+    addEvents();
+}
+
+int Calendar::setLastMonthDays(int daysInLastMonth, int dayOfTheWeek, int iterator)
+{
+    for(int i = daysInLastMonth - (dayOfTheWeek); i <= daysInLastMonth; i++)
     {
         m_month[iterator]->setNumber(i);
         m_month[iterator]->setType("inactive");
         iterator++;
     }
-            
+    return iterator;
+}
+
+void Calendar::addEvents()
+{
     //add events
     for(int e = 0; e < m_allEvents.size(); e++)
     {
-        if(m_allEvents[e]->getMonth() == m_activeMonth && m_allEvents[e]->getYear() == m_activeYear)
+        if(m_allEvents[e]->getMonth() == getActiveMonth() && m_allEvents[e]->getYear() == getActiveYear())
         {
             for(int day = 0; day < m_month.size(); day++)
             {
@@ -412,6 +347,17 @@ void Calendar::drawMonth()
     }
 }
 
+void Calendar::setNextMonthDays(int iterator)
+{
+    //set next month's days.
+    for(int i = 1; iterator < m_month.size(); i++)
+    {
+        m_month[iterator]->setNumber(i);
+        m_month[iterator]->setType("inactive");
+        iterator++;
+    }
+}
+
 void Calendar::constructMonth()
 {
     //create day objects.
@@ -419,7 +365,7 @@ void Calendar::constructMonth()
     {
         for(int w = 0; w < 7; w++)
         {
-            m_month.push_back(new Day(15 + (w * 222), 100 + (h * 101), &m_font));
+            m_month.push_back(new Day(15 + (w * 225), 100 + (h * 103), &m_font));
         }
     }
     
@@ -437,6 +383,7 @@ void Calendar::constructMonth()
     dayOfTheWeek = ((currentYear + currentYear / 4 - currentYear / 100 + currentYear / 400 + t[currentMonth - 1] + day) % 7);
     
     int daysInLastMonth = 0;
+    
     if(m_currentDate->tm_mon != 0)
     {
         daysInLastMonth = getDaysInMonth(m_currentDate->tm_mon - 1, m_currentDate->tm_year + 1900);
@@ -445,6 +392,7 @@ void Calendar::constructMonth()
     {
         daysInLastMonth = getDaysInMonth(11, (m_currentDate->tm_year - 1) + 1900);
     }
+    
     int daysInThisMonth = getDaysInMonth(m_currentDate->tm_mon, m_currentDate->tm_year + 1900);
     
     if(dayOfTheWeek == 0)
@@ -453,14 +401,8 @@ void Calendar::constructMonth()
     }
     
     int iterator = 0;
-    
-    //set last month's days.
-    for(int i = daysInLastMonth - (dayOfTheWeek); i <= daysInLastMonth; i++)
-    {
-        m_month[iterator]->setNumber(i);
-        m_month[iterator]->setType("inactive");
-        iterator++;
-    }
+
+    iterator = setLastMonthDays(daysInLastMonth, dayOfTheWeek, iterator);
     
     //set this month's days.
     for(int i = 1; i <= daysInThisMonth; i++)
@@ -478,31 +420,8 @@ void Calendar::constructMonth()
         
         iterator++;
     }
-    
-    //set next month's days.
-    for(int i = 1; iterator < m_month.size(); i++)
-    {
-        m_month[iterator]->setNumber(i);
-        m_month[iterator]->setType("inactive");
-        iterator++;
-    }
-        
-    for(int e = 0; e < m_allEvents.size(); e++)
-    {
-        if(m_allEvents[e]->getMonth() == m_activeMonth && m_allEvents[e]->getYear() == m_activeYear)
-        {
-            for(int day = 0; day < m_month.size(); day++)
-            {
-                if(m_month[day]->getNumber() == m_allEvents[e]->getDay())
-                {
-                    if(m_month[day]->getType() == "default" || m_month[day]->getType() == "current")
-                    {
-                        m_month[day]->addEvent(m_allEvents[e]);
-                    }
-                }
-            }
-        }
-    }
+    setNextMonthDays(iterator);
+    addEvents();
 }
 
 void Calendar::prepBeforeMonthChange()
@@ -569,9 +488,9 @@ void Calendar::handleInput(sf::Event* event)
             }
             
             //Handle the text input field
-            if(rectIncludesPoint(m_titleField->getRect(), event->mouseButton.x, event->mouseButton.y) == true)
+            if(rectIncludesPoint(m_addNoteField->getRect(), event->mouseButton.x, event->mouseButton.y) == true)
             {
-                m_targetTextField = m_titleField;
+                m_targetTextField = m_addNoteField;
                 m_targetTextField->setBorder("targeted");
                 m_editNoteField->setBorder("normal");
             }
@@ -581,7 +500,7 @@ void Calendar::handleInput(sf::Event* event)
             {
                 m_targetTextField = m_editNoteField;
                 m_targetTextField->setBorder("targeted");
-                m_titleField->setBorder("normal");
+                m_addNoteField->setBorder("normal");
             }
             
             //Handle days and their events
@@ -592,7 +511,7 @@ void Calendar::handleInput(sf::Event* event)
                 
                 m_targetEvent = NULL;
                 m_targetTextField = NULL;
-                m_titleField->setBorder("normal");
+                m_addNoteField->setBorder("normal");
                 m_target->updateEventTextColor(m_targetEvent);
                 
                 std::string targetsMonth = "";
@@ -648,7 +567,8 @@ void Calendar::handleInput(sf::Event* event)
                 if(clickedEvent != NULL)
                 {
                     m_targetTextField = NULL;
-                    m_titleField->setBorder("normal");
+                    m_addNoteField->setBorder("normal");
+                    m_editNoteField->setBorder("normal");
                     m_targetEvent = clickedEvent;
                     m_target->updateEventTextColor(clickedEvent);
                     m_deleteNoteButton.setPosition(980 + clickedEvent->getEventText()->getGlobalBounds().width + 4, clickedEvent->getEventText()->getPosition().y - 10);
@@ -661,12 +581,12 @@ void Calendar::handleInput(sf::Event* event)
             {
                 if(spriteIncludesPoint(&m_addNoteButton, event->mouseButton.x, event->mouseButton.y) == true)
                 {
-                    if(m_titleField->getValue() != "")
+                    if(m_addNoteField->getValue() != "")
                     {
-                        Event* newEvent = new Event(m_titleField->getValue(), m_activeMonth, m_target->getNumber(), m_activeYear);
+                        Event* newEvent = new Event(m_addNoteField->getValue(), m_activeMonth, m_target->getNumber(), m_activeYear);
                         m_allEvents.push_back(newEvent);
                         m_target->addEvent(newEvent);
-                        m_titleField->setValue("");
+                        m_addNoteField->setValue("");
                     }
                 }
             }
@@ -700,19 +620,26 @@ void Calendar::handleInput(sf::Event* event)
                 {
                     if(m_editNoteField->getValue() != "")
                     {
-                        m_targetEvent->setTitle(m_editNoteField->getValue());
+                        if(m_target->deleteEvent(m_targetEvent) == true)
+                        {
+                            deleteEvent(m_targetEvent);
+                            m_targetEvent = NULL;
+                        }
+                        
+                        Event* newEvent = new Event(m_editNoteField->getValue(), m_activeMonth, m_target->getNumber(), m_activeYear);
+                        m_allEvents.push_back(newEvent);
+                        m_target->addEvent(newEvent);
                         m_editNoteField->setValue("");
-                        m_target->refreshContent();
-                        m_targetEvent = NULL;
-                        //m_target->drawEvents(&m_window);
                     }
                 }
             }
         }
     }
     
+    
     if(event->type == sf::Event::KeyPressed)
     {
+        //Handle pressed delete keyboard button
         if(event->key.code == sf::Keyboard::Delete)
         {
             if(m_targetEvent != NULL)
@@ -725,32 +652,50 @@ void Calendar::handleInput(sf::Event* event)
             }
         }
         
+        //Handle pressed return keyboard button
         if(event->key.code == sf::Keyboard::Return)
         {
             if(m_target != NULL)
             {
-                if(m_titleField->getValue() != "")
+                if(m_addNoteField->getValue() != "")
                 {
-                    Event* newEvent = new Event(m_titleField->getValue(), m_activeMonth, m_target->getNumber(), m_activeYear);
+                    Event* newEvent = new Event(m_addNoteField->getValue(), m_activeMonth, m_target->getNumber(), m_activeYear);
                     m_allEvents.push_back(newEvent);
                     m_target->addEvent(newEvent);
-                    m_titleField->setValue("");
+                    m_addNoteField->setValue("");
+                }
+                
+                if(m_editNoteField->getValue() != "")
+                {
+                    if(m_target->deleteEvent(m_targetEvent) == true)
+                    {
+                        deleteEvent(m_targetEvent);
+                        m_targetEvent = NULL;
+                    }
+                    
+                    Event* newEvent = new Event(m_editNoteField->getValue(), m_activeMonth, m_target->getNumber(), m_activeYear);
+                    m_allEvents.push_back(newEvent);
+                    m_target->addEvent(newEvent);
+                    m_editNoteField->setValue("");
                 }
             }
         }
         
+        //Handle pressed left keyboard button
         if(event->key.code == sf::Keyboard::Left)
         {
             prevMonth();
             updateDayColors();
         }
         
+        //Handle pressed right keyboard button
         if(event->key.code == sf::Keyboard::Right)
         {
             nextMonth();
             updateDayColors();
         }
         
+        //Handle pressed escape keyboard button
         if(event->key.code == sf::Keyboard::Escape)
         {
             m_target = NULL;
@@ -890,6 +835,75 @@ Day* Calendar::getClickedDay(int clickX, int clickY)
     return result;
 }
 
+std::string Calendar::addSpaces(std::string str)
+{
+    for(int c = 0; c < str.length(); c++)
+    {
+        if(str[c] == '_')
+        {
+            str[c] = ' ';
+        }
+    }
+    
+    return str;
+}
+
+std::string Calendar::removeSpaces(std::string str)
+{
+    for(int c = 0; c < str.length(); c++)
+    {
+        if(str[c] == ' ')
+        {
+            str[c] = '_';
+        }
+    }
+    
+    return str;
+}
+
+void Calendar::centerText(sf::Text* text, int x1, int x2, int y)
+{
+    int width = text->getGlobalBounds().width;
+    int x = x1 + ((x2 - x1) - width) / 2;
+    text->setPosition(x, y);
+}
+
+void Calendar::updateDayColors()
+{
+    //make all unselected
+    for(int i = 0; i < m_month.size(); i++)
+    {
+        m_month[i]->setSelected(false);
+    }
+    
+    //select target
+    if(m_target != NULL)
+    {
+        m_target->setSelected(true);
+    }
+}
+
+bool Calendar::spriteIncludesPoint(sf::Sprite* sprite, int x, int y)
+{
+    if(x >= sprite->getPosition().x && x < sprite->getPosition().x + sprite->getGlobalBounds().width
+    && y >= sprite->getPosition().y && y < sprite->getPosition().y + sprite->getGlobalBounds().height)
+    {
+        return true;
+    }
+    
+    return false;
+}
+
+bool Calendar::rectIncludesPoint(sf::RectangleShape* rect, int x, int y)
+{
+    if(x >= rect->getPosition().x && x < rect->getPosition().x + rect->getGlobalBounds().width
+    && y >= rect->getPosition().y && y < rect->getPosition().y + rect->getGlobalBounds().height)
+    {
+        return true;
+    }
+    
+    return false;
+}
 
 
 
