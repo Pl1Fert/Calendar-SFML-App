@@ -8,7 +8,7 @@ Calendar::Calendar()
     m_window.setFramerateLimit(60);
     m_window.setVerticalSyncEnabled(true);
     
-    m_font.loadFromFile("/Users/user/Documents/прога универ/сем 3/Calendar/Calendar/Data/arial.ttf");
+    m_font.loadFromFile("/Users/pl1fert/Documents/прога универ/сем 3/Calendar/Calendar/Data/arial.ttf");
     
     m_currentTime = time(0);
     m_currentDate = localtime(&m_currentTime);
@@ -33,14 +33,14 @@ Calendar::Calendar()
     m_daysLabel.setCharacterSize(28);
     m_daysLabel.setStyle(sf::Text::Bold);
     
-    m_leftSelectorImage.loadFromFile("/Users/user/Documents/прога универ/сем 3/Calendar/Calendar/Images/SelectorLeft.png");
-    m_rightSelectorImage.loadFromFile("/Users/user/Documents/прога универ/сем 3/Calendar/Calendar/Images/SelectorRight.png");
+    m_leftSelectorImage.loadFromFile("/Users/pl1fert/Documents/прога универ/сем 3/Calendar/Calendar/Images/SelectorLeft.png");
+    m_rightSelectorImage.loadFromFile("/Users/pl1fert/Documents/прога универ/сем 3/Calendar/Calendar/Images/SelectorRight.png");
     m_leftSelector.setTexture(m_leftSelectorImage);
     m_leftSelector.setPosition(600, 12);
     m_rightSelector.setTexture(m_rightSelectorImage);
     m_rightSelector.setPosition(980, 11);
     
-    m_dividerImage.loadFromFile("/Users/user/Documents/прога универ/сем 3/Calendar/Calendar/Images/Divider.png");
+    m_dividerImage.loadFromFile("/Users/pl1fert/Documents/прога универ/сем 3/Calendar/Calendar/Images/Divider.png");
     m_divider.setTexture(m_dividerImage);
     m_divider.setPosition(680, 778);
     
@@ -50,17 +50,17 @@ Calendar::Calendar()
     m_selectedDay.setCharacterSize(24);
     m_selectedDay.setStyle(sf::Text::Bold);
     
-    m_deleteNoteButtonImage.loadFromFile("/Users/user/Documents/прога универ/сем 3/Calendar/Calendar/Images/DeleteButton.png");
+    m_deleteNoteButtonImage.loadFromFile("/Users/pl1fert/Documents/прога универ/сем 3/Calendar/Calendar/Images/DeleteButton.png");
     m_deleteNoteButton.setTexture(m_deleteNoteButtonImage);
     
-    m_editNoteButtonImage.loadFromFile("/Users/user/Documents/прога универ/сем 3/Calendar/Calendar/Images/EditButton.png");
+    m_editNoteButtonImage.loadFromFile("/Users/pl1fert/Documents/прога универ/сем 3/Calendar/Calendar/Images/EditButton.png");
     m_editNoteButton.setTexture(m_editNoteButtonImage);
     
-    m_secondEditNoteButtonImage.loadFromFile("/Users/user/Documents/прога универ/сем 3/Calendar/Calendar/Images/EditButton.png");
+    m_secondEditNoteButtonImage.loadFromFile("/Users/pl1fert/Documents/прога универ/сем 3/Calendar/Calendar/Images/EditButton.png");
     m_secondEditNoteButton.setTexture(m_secondEditNoteButtonImage);
     m_secondEditNoteButton.setPosition(250, 1040);
     
-    m_addNoteButtonImage.loadFromFile("/Users/user/Documents/прога универ/сем 3/Calendar/Calendar/Images/AddButton.png");
+    m_addNoteButtonImage.loadFromFile("/Users/pl1fert/Documents/прога универ/сем 3/Calendar/Calendar/Images/AddButton.png");
     m_addNoteButton.setTexture(m_addNoteButtonImage);
     m_addNoteButton.setPosition(250, 840);
     
@@ -81,12 +81,30 @@ Calendar::Calendar()
     m_addNoteField = new TextField("text", "Note: ", 10, 775);
     m_editNoteField = new TextField("text", "Edit: ", 10, 975);
         
-    loadEvents();
-    constructMonth();
+    try
+    {
+        loadEvents();
+    }
+    catch(std::runtime_error &error)
+    {
+        std::cout << "Error: " << error.what() << std::endl;
+    }
+    
+    firstConstructMonth();
 }
 
 Calendar::~Calendar()
 {
+    if(m_addNoteField)
+        delete m_addNoteField;
+    if(m_editNoteField)
+        delete m_editNoteField;
+    if(m_targetTextField)
+        delete m_targetTextField;
+    if(m_target)
+        delete m_target;
+    if(m_targetEvent)
+        delete m_targetEvent;
 }
 
 Calendar* Calendar::getInstance()
@@ -107,7 +125,15 @@ void Calendar::run()
         {
             if(m_event.type == sf::Event::Closed)
             {
-                saveEvents();
+                try
+                {
+                    saveEvents();
+                }
+                catch(std::runtime_error &error)
+                {
+                    std::cout << "Error: " << error.what() << std::endl;
+                }
+                
                 m_window.close();
             }
             
@@ -166,14 +192,12 @@ void Calendar::run()
 void Calendar::loadEvents()
 {
     std::ifstream file;
-    try
+        
+    file.open("/Users/pl1fert/Documents/прога универ/сем 3/Calendar/Calendar/Data/AllEvents.cll");
+    
+    if(!file.is_open())
     {
-        file.open("/Users/user/Documents/прога универ/сем 3/Calendar/Calendar/Data/AllEvents.cll");
-    }
-    catch (const std::ios_base::failure & e)
-    {
-        std::cerr << "can not open file\nError: " << e.what() << std::endl;
-        return;
+        throw std::runtime_error("can not open file!");
     }
     
     std::string title = "";
@@ -209,15 +233,12 @@ void Calendar::sortEvents()
 void Calendar::saveEvents()
 {
     std::ofstream file;
+
+    file.open("/Users/pl1fert/Documents/прога универ/сем 3/Calendar/Calendar/Data/AllEvents.cll");
     
-    try
+    if(!file.is_open())
     {
-        file.open("/Users/user/Documents/прога универ/сем 3/Calendar/Calendar/Data/AllEvents.cll");
-    }
-    catch (const std::ios_base::failure & e)
-    {
-        std::cerr << "can not open file\nError: " << e.what() << std::endl;
-        return;
+        throw std::runtime_error("can not open file!");
     }
     
     for(int i = 0; i < m_allEvents.size(); i++)
@@ -253,9 +274,9 @@ int Calendar::getActiveMonth()
     return m_activeMonth;
 }
 
-void Calendar::drawMonth()
+void Calendar::constructMonth()
 {
-    m_monthLabel.setString(getMonthString(m_activeMonth) + " " + std::to_string(m_activeYear));
+    m_monthLabel.setString(getMonthString(getActiveMonth()) + " " + std::to_string(getActiveYear()));
     
     //Tomohiko Sakamoto’s Algorithm
     int currentYear = getActiveYear();
@@ -358,7 +379,7 @@ void Calendar::setNextMonthDays(int iterator)
     }
 }
 
-void Calendar::constructMonth()
+void Calendar::firstConstructMonth()
 {
     //create day objects.
     for(int h = 0; h < 6; h++)
@@ -451,7 +472,7 @@ void Calendar::nextMonth()
         m_activeMonth++;
     }
     
-    drawMonth();
+    constructMonth();
 }
 
 void Calendar::prevMonth()
@@ -468,7 +489,7 @@ void Calendar::prevMonth()
         m_activeMonth--;
     }
     
-    drawMonth();
+    constructMonth();
 }
 
 void Calendar::handleInput(sf::Event* event)
@@ -503,7 +524,7 @@ void Calendar::handleInput(sf::Event* event)
                 m_addNoteField->setBorder("normal");
             }
             
-            //Handle days and their events
+            //Handle day
             Day* day = getClickedDay(event->mouseButton.x, event->mouseButton.y);
             if(day != NULL)
             {
@@ -521,35 +542,35 @@ void Calendar::handleInput(sf::Event* event)
                 {
                     if(m_target->getNumber() > 15)
                     {
-                        if(m_activeMonth == 0)
+                        if(getActiveMonth() == 0)
                         {
                             targetsMonth = getMonthString(11);
-                            targetsYear = std::to_string(m_activeYear - 1);
+                            targetsYear = std::to_string(getActiveYear() - 1);
                         }
                         else
                         {
-                            targetsMonth = getMonthString(m_activeMonth - 1);
-                            targetsYear = std::to_string(m_activeYear);
+                            targetsMonth = getMonthString(getActiveMonth() - 1);
+                            targetsYear = std::to_string(getActiveYear());
                         }
                     }
                     else if(m_target->getNumber() < 15)
                     {
-                        if(m_activeMonth == 11)
+                        if(getActiveMonth() == 11)
                         {
                             targetsMonth = getMonthString(0);
-                            targetsYear = std::to_string(m_activeYear + 1);
+                            targetsYear = std::to_string(getActiveYear() + 1);
                         }
                         else
                         {
-                            targetsMonth = getMonthString(m_activeMonth + 1);
-                            targetsYear = std::to_string(m_activeYear);
+                            targetsMonth = getMonthString(getActiveMonth() + 1);
+                            targetsYear = std::to_string(getActiveYear());
                         }
                     }
                 }
                 else
                 {
-                    targetsMonth = getMonthString(m_activeMonth);
-                    targetsYear = std::to_string(m_activeYear);
+                    targetsMonth = getMonthString(getActiveMonth());
+                    targetsYear = std::to_string(getActiveYear());
                 }
                 
                 std::string number = std::to_string(m_target->getNumber());
@@ -561,6 +582,7 @@ void Calendar::handleInput(sf::Event* event)
                 centerText(&m_selectedDay, 0, 1600, 740);
             }
             
+            //Handle event
             if(m_target != NULL)
             {
                 Event* clickedEvent = m_target->getClickedEvent(event->mouseButton.x, event->mouseButton.y);
@@ -583,7 +605,7 @@ void Calendar::handleInput(sf::Event* event)
                 {
                     if(m_addNoteField->getValue() != "")
                     {
-                        Event* newEvent = new Event(m_addNoteField->getValue(), m_activeMonth, m_target->getNumber(), m_activeYear);
+                        Event* newEvent = new Event(m_addNoteField->getValue(), getActiveMonth(), m_target->getNumber(), getActiveYear());
                         m_allEvents.push_back(newEvent);
                         m_target->addEvent(newEvent);
                         m_addNoteField->setValue("");
@@ -626,7 +648,7 @@ void Calendar::handleInput(sf::Event* event)
                             m_targetEvent = NULL;
                         }
                         
-                        Event* newEvent = new Event(m_editNoteField->getValue(), m_activeMonth, m_target->getNumber(), m_activeYear);
+                        Event* newEvent = new Event(m_editNoteField->getValue(), getActiveMonth(), m_target->getNumber(), getActiveYear());
                         m_allEvents.push_back(newEvent);
                         m_target->addEvent(newEvent);
                         m_editNoteField->setValue("");
@@ -659,7 +681,7 @@ void Calendar::handleInput(sf::Event* event)
             {
                 if(m_addNoteField->getValue() != "")
                 {
-                    Event* newEvent = new Event(m_addNoteField->getValue(), m_activeMonth, m_target->getNumber(), m_activeYear);
+                    Event* newEvent = new Event(m_addNoteField->getValue(), getActiveMonth(), m_target->getNumber(), getActiveYear());
                     m_allEvents.push_back(newEvent);
                     m_target->addEvent(newEvent);
                     m_addNoteField->setValue("");
@@ -673,7 +695,7 @@ void Calendar::handleInput(sf::Event* event)
                         m_targetEvent = NULL;
                     }
                     
-                    Event* newEvent = new Event(m_editNoteField->getValue(), m_activeMonth, m_target->getNumber(), m_activeYear);
+                    Event* newEvent = new Event(m_editNoteField->getValue(), getActiveMonth(), m_target->getNumber(), getActiveYear());
                     m_allEvents.push_back(newEvent);
                     m_target->addEvent(newEvent);
                     m_editNoteField->setValue("");
@@ -718,11 +740,11 @@ sf::Font* Calendar::getFont()
     return &m_font;
 }
 
-std::string Calendar::getMonthString(int monthNum)
+std::string Calendar::getMonthString(int month)
 {
     std::string returnString = "";
 
-    switch(monthNum)
+    switch(month)
     {
         case 0:
             returnString = "January";

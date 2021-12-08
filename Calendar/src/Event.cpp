@@ -6,7 +6,7 @@ Event::Event(std::string title, int month, int day, int year)
     m_month = month;
     m_day = day;
     m_year = year;
-    m_font.loadFromFile("/Users/user/Documents/прога универ/сем 3/Calendar/Calendar/Data/arial.ttf");
+    m_font.loadFromFile("/Users/pl1fert/Documents/прога универ/сем 3/Calendar/Calendar/Data/arial.ttf");
     
     m_eventText.setString("- " + m_title);
     m_eventText.setFillColor(sf::Color::Black);

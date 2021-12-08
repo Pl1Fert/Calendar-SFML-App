@@ -7,7 +7,6 @@
 #include <SFML/Graphics.hpp>
 
 #include "Day.hpp"
-#include "Event.hpp"
 #include "TextField.hpp"
 
 class Calendar
@@ -70,8 +69,8 @@ private:
     int getActiveMonth();
     
     void handleInput(sf::Event*);
+    void firstConstructMonth();
     void constructMonth();
-    void drawMonth();
     void nextMonth();
     void prevMonth();
     void setNextMonthDays(int);

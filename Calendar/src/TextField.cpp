@@ -2,7 +2,7 @@
 
 TextField::TextField(std::string type, std::string label, int xPos, int yPos)
 {
-    m_font.loadFromFile("/Users/user/Documents/прога универ/сем 3/Calendar/Calendar/Data/arial.ttf");
+    m_font.loadFromFile("/Users/pl1fert/Documents/прога универ/сем 3/Calendar/Calendar/Data/arial.ttf");
 
     m_type = type;
     
