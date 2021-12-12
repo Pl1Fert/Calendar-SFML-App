@@ -90,7 +90,8 @@ Calendar::Calendar()
         std::cout << "Error: " << error.what() << std::endl;
     }
     
-    firstConstructMonth();
+    createDayObjects();
+    constructMonth();
 }
 
 Calendar::~Calendar()
@@ -162,6 +163,7 @@ void Calendar::run()
         if(m_target != NULL)
         {
             m_window.draw(m_selectedDay);
+            m_target->drawEvents(&m_window);
             
             if(m_target->getType() != "inactive")
             {
@@ -169,11 +171,6 @@ void Calendar::run()
                 m_addNoteField->draw(&m_window);
                 m_window.draw(m_addNoteButton);
             }
-        }
-        
-        if(m_target != NULL)
-        {
-            m_target->drawEvents(&m_window);
         }
         
         if(m_target != NULL && m_targetEvent != NULL)
@@ -213,7 +210,7 @@ void Calendar::loadEvents()
     }
     
     file.close();
-    sortEvents();
+    sortEvents(); //?????????????????
 }
 
 void Calendar::sortEvents()
@@ -379,9 +376,8 @@ void Calendar::setNextMonthDays(int iterator)
     }
 }
 
-void Calendar::firstConstructMonth()
+void Calendar::createDayObjects()
 {
-    //create day objects.
     for(int h = 0; h < 6; h++)
     {
         for(int w = 0; w < 7; w++)
@@ -389,61 +385,73 @@ void Calendar::firstConstructMonth()
             m_month.push_back(new Day(15 + (w * 225), 100 + (h * 103), &m_font));
         }
     }
-    
-    //Tomohiko Sakamoto’s Algorithm
-    int currentYear = m_currentDate->tm_year;
-    int currentMonth = m_currentDate->tm_mon + 1;
-    
-    int dayOfTheWeek;
-    int day = 1;
-    static int t[] = {0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4};
-        
-    if(currentMonth < 3)
-        currentYear--;
-    
-    dayOfTheWeek = ((currentYear + currentYear / 4 - currentYear / 100 + currentYear / 400 + t[currentMonth - 1] + day) % 7);
-    
-    int daysInLastMonth = 0;
-    
-    if(m_currentDate->tm_mon != 0)
-    {
-        daysInLastMonth = getDaysInMonth(m_currentDate->tm_mon - 1, m_currentDate->tm_year + 1900);
-    }
-    else
-    {
-        daysInLastMonth = getDaysInMonth(11, (m_currentDate->tm_year - 1) + 1900);
-    }
-    
-    int daysInThisMonth = getDaysInMonth(m_currentDate->tm_mon, m_currentDate->tm_year + 1900);
-    
-    if(dayOfTheWeek == 0)
-    {
-        dayOfTheWeek += 7;
-    }
-    
-    int iterator = 0;
-
-    iterator = setLastMonthDays(daysInLastMonth, dayOfTheWeek, iterator);
-    
-    //set this month's days.
-    for(int i = 1; i <= daysInThisMonth; i++)
-    {
-        m_month[iterator]->setNumber(i);
-    
-        if(i == m_currentDate->tm_mday)
-        {
-            m_month[iterator]->setType("current");
-        }
-        else
-        {
-            m_month[iterator]->setType("default");
-        }
-        
-        iterator++;
-    }
-    setNextMonthDays(iterator);
-    addEvents();
 }
+
+//void Calendar::firstConstructMonth()
+//{
+//    //create day objects.
+//    for(int h = 0; h < 6; h++)
+//    {
+//        for(int w = 0; w < 7; w++)
+//        {
+//            m_month.push_back(new Day(15 + (w * 225), 100 + (h * 103), &m_font));
+//        }
+//    }
+//
+//    //Tomohiko Sakamoto’s Algorithm
+//    int currentYear = m_currentDate->tm_year;
+//    int currentMonth = m_currentDate->tm_mon + 1;
+//
+//    int dayOfTheWeek;
+//    int day = 1;
+//    static int t[] = {0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4};
+//
+//    if(currentMonth < 3)
+//        currentYear--;
+//
+//    dayOfTheWeek = ((currentYear + currentYear / 4 - currentYear / 100 + currentYear / 400 + t[currentMonth - 1] + day) % 7);
+//
+//    int daysInLastMonth = 0;
+//
+//    if(m_currentDate->tm_mon != 0)
+//    {
+//        daysInLastMonth = getDaysInMonth(m_currentDate->tm_mon - 1, m_currentDate->tm_year + 1900);
+//    }
+//    else
+//    {
+//        daysInLastMonth = getDaysInMonth(11, (m_currentDate->tm_year - 1) + 1900);
+//    }
+//
+//    int daysInThisMonth = getDaysInMonth(m_currentDate->tm_mon, m_currentDate->tm_year + 1900);
+//
+//    if(dayOfTheWeek == 0)
+//    {
+//        dayOfTheWeek += 7;
+//    }
+//
+//    int iterator = 0;
+//
+//    iterator = setLastMonthDays(daysInLastMonth, dayOfTheWeek, iterator);
+//
+//    //set this month's days.
+//    for(int i = 1; i <= daysInThisMonth; i++)
+//    {
+//        m_month[iterator]->setNumber(i);
+//
+//        if(i == m_currentDate->tm_mday)
+//        {
+//            m_month[iterator]->setType("current");
+//        }
+//        else
+//        {
+//            m_month[iterator]->setType("default");
+//        }
+//
+//        iterator++;
+//    }
+//    setNextMonthDays(iterator);
+//    addEvents();
+//}
 
 void Calendar::prepBeforeMonthChange()
 {

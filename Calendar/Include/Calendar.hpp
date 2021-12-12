@@ -82,6 +82,7 @@ private:
     void sortEvents();
     void addEvents();
     void saveEvents();
+    void createDayObjects();
 
     sf::Font* getFont();
     std::string getMonthString(int);
