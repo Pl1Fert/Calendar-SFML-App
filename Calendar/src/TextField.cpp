@@ -42,16 +42,34 @@ std::string TextField::getValue()
     return m_value;
 }
 
+std::string TextField::ws2s(const std::wstring& wstr)
+{
+    using convert_typeX = std::codecvt_utf8<wchar_t>;
+    std::wstring_convert<convert_typeX, wchar_t> converterX;
+
+    return converterX.to_bytes(wstr);
+}
+
+std::wstring TextField::s2ws(const std::string& str)
+{
+    using convert_typeX = std::codecvt_utf8<wchar_t>;
+    std::wstring_convert<convert_typeX, wchar_t> converterX;
+
+    return converterX.from_bytes(str);
+}
+
 void TextField::handleInput(sf::Event* event)
 {
     if(m_type == "text")
     {
-        if(event->type == sf::Event::TextEntered && (event->text.unicode >= 32 && event->text.unicode <= 126))
+        if(event->type == sf::Event::TextEntered && (event->text.unicode >= 32 && event->text.unicode <= 1103))
         {
             if(m_valueText.getGlobalBounds().width <= 334 - 16)
             {
-                m_value += static_cast<char>(event->text.unicode);
-                m_valueText.setString(m_value);
+                m_string += static_cast<wchar_t>(event->text.unicode);
+                m_valueText.setString(m_string);
+                //m_value = m_string;
+                m_value = ws2s(m_string);
             }
         }
     }
@@ -71,8 +89,9 @@ void TextField::handleInput(sf::Event* event)
     {
         if(event->key.code == sf::Keyboard::BackSpace)
         {
-            m_value = m_value.substr(0, m_value.length() - 1);
-            m_valueText.setString(m_value);
+            m_string = m_string.substr(0, m_string.length() - 1);
+            m_valueText.setString(m_string);
+            m_value = ws2s(m_string);
         }
     }
 }
@@ -80,7 +99,8 @@ void TextField::handleInput(sf::Event* event)
 void TextField::setValue(std::string value)
 {
     m_value = value;
-    m_valueText.setString(value);
+    m_string = s2ws(m_value);
+    m_valueText.setString(m_string);
 }
 
 void TextField::setBorder(std::string type)

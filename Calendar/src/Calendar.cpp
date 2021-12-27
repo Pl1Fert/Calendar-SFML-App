@@ -934,15 +934,3 @@ bool Calendar::rectIncludesPoint(sf::RectangleShape* rect, int x, int y)
     
     return false;
 }
-
-
-
-
-
-
-
-
-
-
-
-

@@ -183,7 +183,7 @@ void Day::refreshContent()
             if(m_dayContent[e]->getGlobalBounds().width <= 130)
             {
                 content += title[c];
-                m_dayContent[e]->setString(content);
+                m_dayContent[e]->setString(sf::String::fromUtf8(content.begin(), content.end()));
             }
         }
         

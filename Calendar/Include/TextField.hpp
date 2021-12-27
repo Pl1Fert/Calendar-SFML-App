@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <string>
+#include <codecvt>
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
@@ -16,6 +17,7 @@ private:
     sf::Text m_valueText;
     sf::RectangleShape m_borderRect;
     sf::Font m_font;
+    std::wstring m_string;
 public:
     TextField(std::string, std::string, int, int);
     ~TextField();
@@ -27,4 +29,6 @@ public:
     void setValue(std::string);
     void setBorder(std::string);
     void draw(sf::RenderWindow*);
+    std::string ws2s(const std::wstring& wstr);
+    std::wstring s2ws(const std::string& str);
 };

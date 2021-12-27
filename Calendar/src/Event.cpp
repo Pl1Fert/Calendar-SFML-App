@@ -8,7 +8,7 @@ Event::Event(std::string title, int month, int day, int year)
     m_year = year;
     m_font.loadFromFile("/Users/pl1fert/Documents/прога универ/сем 3/Calendar/Calendar/Data/arial.ttf");
     
-    m_eventText.setString("- " + m_title);
+    m_eventText.setString(L"- " + sf::String::fromUtf8(m_title.begin(), m_title.end()));
     m_eventText.setFillColor(sf::Color::Black);
     m_eventText.setCharacterSize(24);
 }
@@ -53,4 +53,3 @@ void Event::draw(sf::RenderWindow* window, int iterator)
     m_eventText.setFont(m_font);
     window->draw(m_eventText);
 }
-
